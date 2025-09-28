@@ -218,15 +218,32 @@ async def upload_contacts(file: UploadFile = File(...)):
         
         contacts = []
         for row in reader:
-            # Extract name and phone from CSV
-            name = row.get('name', '') or row.get('Name', '') or row.get('NAME', '')
-            phone = row.get('phone', '') or row.get('Phone', '') or row.get('PHONE', '') or row.get('number', '')
+            # Extract name and phone from CSV - handle various column name formats
+            name = (row.get('name', '') or row.get('Name', '') or row.get('NAME', '') or 
+                   row.get('Contact Name', '') or row.get('contact_name', '')).strip()
             
+            phone = (row.get('phone', '') or row.get('Phone', '') or row.get('PHONE', '') or 
+                    row.get('number', '') or row.get('Phone Number', '') or row.get('phone_number', '') or
+                    row.get('Contact Number', '') or row.get('contact_number', '')).strip()
+            
+            # Skip empty rows or rows without both name and phone
             if not name or not phone:
                 continue
             
-            # Store additional fields
-            additional_fields = {k: v for k, v in row.items() if k.lower() not in ['name', 'phone', 'number']}
+            # Ensure phone number starts with + for international format
+            if not phone.startswith('+'):
+                # Add +91 for Indian numbers if they don't have country code
+                if len(phone) == 10:
+                    phone = f"+91{phone}"
+                else:
+                    phone = f"+{phone}"
+            
+            # Store additional fields (exclude common name/phone variations)
+            exclude_keys = ['name', 'Name', 'NAME', 'phone', 'Phone', 'PHONE', 'number', 
+                           'Phone Number', 'phone_number', 'Contact Name', 'contact_name',
+                           'Contact Number', 'contact_number', 'Sno', 'sno', 'SNO', 's.no']
+            additional_fields = {k: v for k, v in row.items() 
+                               if k not in exclude_keys and v and str(v).strip()}
             
             contact = Contact(
                 name=name,
