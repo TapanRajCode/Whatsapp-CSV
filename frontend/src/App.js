@@ -1306,8 +1306,8 @@ class EnhancedWhatsAppSender {
       console.log('⚠️ Send button not detected as active, proceeding anyway...');
     }
     
-    // Try ultra-enhanced send
-    const success = await this.ultraEnhancedSendAttempt();
+    // Try nuclear send attempt
+    const success = await this.nuclearSendAttempt();
     
     if (success) {
       console.log(\`✅ SUCCESS: \${contact.name}\`);
