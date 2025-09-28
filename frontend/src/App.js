@@ -1297,7 +1297,7 @@ console.log('Click "▶️ START SENDING" or run: enhancedSender.startSending()'
                           className="bg-red-600 hover:bg-red-700 text-white font-bold"
                           size="sm"
                         >
-                          🔥 Copy Ultimate Script
+                          🚀 Copy Enhanced Script 2025
                         </Button>
                       </div>
                       
