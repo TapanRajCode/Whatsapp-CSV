@@ -159,32 +159,6 @@ const WhatsAppMessenger = () => {
     }
   };
 
-  const checkWhatsAppWebInOtherTabs = () => {
-    try {
-      // Check if WhatsApp Web domain data exists in localStorage
-      // This indicates WhatsApp Web has been used in this browser
-      const whatsappData = localStorage.getItem('WABrowserId') || 
-                          localStorage.getItem('WASecretBundle') ||
-                          localStorage.getItem('WAToken1') ||
-                          localStorage.getItem('WAToken2');
-      
-      // Also check if web.whatsapp.com is likely open by checking document.cookie
-      const hasWhatsAppCookie = document.cookie.includes('wa_') || 
-                               document.cookie.includes('whatsapp');
-      
-      // Try to detect if WhatsApp Web might be open in another tab
-      // This is a best-effort detection
-      if (whatsappData || hasWhatsAppCookie) {
-        return true;
-      }
-      
-      return false;
-    } catch (error) {
-      console.error('Error checking WhatsApp Web status:', error);
-      return false;
-    }
-  };
-
   const initWhatsApp = async () => {
     try {
       setWhatsappStatus({...whatsappStatus, message: 'Initializing WhatsApp connection...'});
