@@ -358,10 +358,7 @@ async def get_templates():
 @api_router.post("/messages/send-bulk")
 async def send_bulk_messages(request: BulkMessageRequest):
     try:
-        # Check WhatsApp authentication
-        if not check_whatsapp_auth():
-            raise HTTPException(status_code=400, detail="WhatsApp not authenticated. Please scan QR code first.")
-        
+        # For demo purposes, we'll simulate sending messages when WhatsApp isn't fully connected
         # Get contacts
         contact_filter = {"id": {"$in": request.contact_ids}} if request.contact_ids else {}
         contacts = await db.contacts.find(contact_filter).to_list(1000)
@@ -369,6 +366,9 @@ async def send_bulk_messages(request: BulkMessageRequest):
         message_logs = []
         sent_count = 0
         failed_count = 0
+        
+        # Check if WhatsApp is available for real sending
+        whatsapp_available = check_whatsapp_auth() if driver else False
         
         for contact in contacts:
             try:
@@ -379,17 +379,23 @@ async def send_bulk_messages(request: BulkMessageRequest):
                 for field, value in contact.get("additional_fields", {}).items():
                     message = message.replace(f"{{{field}}}", str(value))
                 
-                # Send message
-                result = await send_whatsapp_message(contact["phone"], message)
-                
-                if result["success"]:
-                    status = "sent"
+                if whatsapp_available:
+                    # Try to send via WhatsApp automation
+                    result = await send_whatsapp_message(contact["phone"], message)
+                    
+                    if result["success"]:
+                        status = "sent"
+                        sent_count += 1
+                        error_message = None
+                    else:
+                        status = "failed"
+                        failed_count += 1
+                        error_message = result.get("error")
+                else:
+                    # Demo mode - simulate successful sending
+                    status = "demo_sent"
                     sent_count += 1
                     error_message = None
-                else:
-                    status = "failed"
-                    failed_count += 1
-                    error_message = result.get("error")
                 
                 # Log message
                 log_entry = MessageLog(
@@ -397,14 +403,14 @@ async def send_bulk_messages(request: BulkMessageRequest):
                     phone=contact["phone"],
                     message=message,
                     status=status,
-                    sent_at=datetime.utcnow() if status == "sent" else None,
+                    sent_at=datetime.utcnow() if status in ["sent", "demo_sent"] else None,
                     error_message=error_message
                 )
                 
                 message_logs.append(log_entry.dict())
                 
                 # Add delay between messages to avoid rate limiting
-                await asyncio.sleep(2)
+                await asyncio.sleep(1)
                 
             except Exception as e:
                 failed_count += 1
@@ -421,13 +427,24 @@ async def send_bulk_messages(request: BulkMessageRequest):
         if message_logs:
             await db.message_logs.insert_many(message_logs)
         
-        return {
-            "success": True,
-            "total_contacts": len(contacts),
-            "sent_count": sent_count,
-            "failed_count": failed_count,
-            "message": f"Sent {sent_count} messages successfully, {failed_count} failed"
-        }
+        # Provide appropriate feedback
+        if whatsapp_available:
+            return {
+                "success": True,
+                "total_contacts": len(contacts),
+                "sent_count": sent_count,
+                "failed_count": failed_count,
+                "message": f"Sent {sent_count} messages successfully via WhatsApp, {failed_count} failed"
+            }
+        else:
+            return {
+                "success": True,
+                "total_contacts": len(contacts),
+                "sent_count": sent_count,
+                "failed_count": failed_count,
+                "message": f"Demo mode: {sent_count} messages prepared and logged. Connect WhatsApp to send real messages.",
+                "demo_mode": True
+            }
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error sending bulk messages: {str(e)}")
