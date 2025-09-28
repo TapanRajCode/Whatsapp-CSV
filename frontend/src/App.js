@@ -28,6 +28,7 @@ const WhatsAppMessenger = () => {
   const [connectionInstructions, setConnectionInstructions] = useState(null);
   const [showFormatting, setShowFormatting] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showMessagePreview, setShowMessagePreview] = useState(true);
   const [whatsappManualOverride, setWhatsappManualOverride] = useState(false);
 
   // Common emojis for quick access
