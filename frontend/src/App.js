@@ -860,12 +860,17 @@ Jane Smith,+0987654321,XYZ Inc
                   {/* Instructions */}
                   <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
                     <h4 className="font-medium text-yellow-900 mb-2">📝 How Bulk Sending Works:</h4>
-                    <ol className="text-sm text-yellow-800 space-y-1">
+                    <ol className="text-sm text-yellow-800 space-y-1 mb-3">
                       <li><strong>1.</strong> Click "Prepare Bulk Send" to process all your contacts</li>
                       <li><strong>2.</strong> Click "Send All" to open WhatsApp Web tabs for each contact</li>
                       <li><strong>3.</strong> Each tab opens with the personalized message pre-filled</li>
                       <li><strong>4.</strong> Simply click "Send" in each WhatsApp Web tab</li>
                     </ol>
+                    
+                    <div className="p-2 bg-orange-100 rounded text-xs text-orange-800">
+                      <strong>⚠️ Browser Popup Blocker:</strong> If tabs don't open automatically, your browser may be blocking popups. 
+                      Click the popup blocker icon in your address bar and select "Always allow popups from this site" or use the individual "Send to [Name]" buttons.
+                    </div>
                   </div>
                 </div>
               </CardContent>
