@@ -1490,7 +1490,7 @@ control.innerHTML = \`
     box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
     transition: transform 0.2s;
   " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-    ⚡ START ULTRA SEND
+    💥 START NUCLEAR SEND
   </button>
   
   <button id="enhanced-stop" style="
