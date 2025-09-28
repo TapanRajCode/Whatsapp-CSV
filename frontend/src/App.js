@@ -783,23 +783,58 @@ Jane Smith,+0987654321,XYZ Inc
                               {messageLogs.filter(log => log.status === 'ready_for_batch_send').length} personalized messages are prepared and ready
                             </p>
                           </div>
-                          <Button
-                            onClick={() => {
-                              const readyMessages = messageLogs.filter(log => log.status === 'ready_for_batch_send' && log.error_message);
-                              readyMessages.forEach((log, index) => {
+                          <div className="space-y-2">
+                            <Button
+                              onClick={() => {
+                                const readyMessages = messageLogs.filter(log => log.status === 'ready_for_batch_send' && log.error_message);
+                                if (readyMessages.length === 0) return;
+                                
+                                // Open first message immediately
+                                window.open(readyMessages[0].error_message, '_blank');
+                                
+                                // Show instructions for popup blocker
                                 setTimeout(() => {
-                                  window.open(log.error_message, '_blank');
-                                }, index * 1000); // 1 second delay between each
-                              });
-                            }}
-                            className="bg-blue-600 hover:bg-blue-700 text-white"
-                            size="lg"
-                          >
-                            🚀 Send All ({messageLogs.filter(log => log.status === 'ready_for_batch_send').length})
-                          </Button>
+                                  const remainingCount = readyMessages.length - 1;
+                                  if (remainingCount > 0) {
+                                    const proceed = confirm(`✅ First WhatsApp tab opened!\n\n⚠️ If other tabs were blocked by your browser:\n\n1. Allow popups for this site\n2. Or click "Send Remaining ${remainingCount}" button below\n\nClick OK to continue with remaining messages.`);
+                                    
+                                    if (proceed) {
+                                      // Open remaining messages one by one with delays
+                                      readyMessages.slice(1).forEach((log, index) => {
+                                        setTimeout(() => {
+                                          window.open(log.error_message, '_blank');
+                                        }, (index + 1) * 2000); // 2 second delay between each
+                                      });
+                                    }
+                                  }
+                                }, 1000);
+                              }}
+                              className="bg-blue-600 hover:bg-blue-700 text-white"
+                              size="lg"
+                            >
+                              🚀 Send All ({messageLogs.filter(log => log.status === 'ready_for_batch_send').length})
+                            </Button>
+                            
+                            <div className="grid grid-cols-1 gap-1">
+                              {messageLogs.filter(log => log.status === 'ready_for_batch_send').map((log, index) => {
+                                const contactName = contacts.find(c => c.phone === log.phone)?.name || 'Contact';
+                                return (
+                                  <Button
+                                    key={log.id}
+                                    onClick={() => window.open(log.error_message, '_blank')}
+                                    variant="outline"
+                                    size="sm"
+                                    className="text-xs justify-start"
+                                  >
+                                    📱 Send to {contactName}
+                                  </Button>
+                                );
+                              })}
+                            </div>
+                          </div>
                         </div>
                         <div className="mt-3 text-xs text-blue-600">
-                          💡 This will open WhatsApp Web tabs for each contact with messages pre-filled. Just click Send in each tab!
+                          💡 If popups are blocked, use individual "Send to [Name]" buttons below or allow popups for this site
                         </div>
                       </div>
                     )}
