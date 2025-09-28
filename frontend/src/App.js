@@ -289,63 +289,6 @@ const WhatsAppMessenger = () => {
     }
   };
 
-  const insertFormatting = (format) => {
-    const textarea = document.querySelector('textarea[placeholder*="Hi {name}"]');
-    if (!textarea) return;
-
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = messageTemplate.substring(start, end);
-    
-    let formattedText = '';
-    switch (format) {
-      case 'bold':
-        formattedText = selectedText ? `*${selectedText}*` : '*bold text*';
-        break;
-      case 'italic':
-        formattedText = selectedText ? `_${selectedText}_` : '_italic text_';
-        break;
-      case 'monospace':
-        formattedText = selectedText ? `\`\`\`${selectedText}\`\`\`` : '```monospace text```';
-        break;
-      case 'strikethrough':
-        formattedText = selectedText ? `~${selectedText}~` : '~strikethrough text~';
-        break;
-      default:
-        formattedText = selectedText;
-    }
-
-    const newMessage = messageTemplate.substring(0, start) + formattedText + messageTemplate.substring(end);
-    setMessageTemplate(newMessage);
-    
-    // Reset cursor position
-    setTimeout(() => {
-      textarea.focus();
-      const newPos = start + formattedText.length;
-      textarea.setSelectionRange(newPos, newPos);
-    }, 0);
-  };
-
-  const insertEmoji = (emoji) => {
-    const textarea = document.querySelector('textarea[placeholder*="Hi {name}"]');
-    if (!textarea) return;
-
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    
-    const newMessage = messageTemplate.substring(0, start) + emoji + messageTemplate.substring(end);
-    setMessageTemplate(newMessage);
-    
-    // Reset cursor position
-    setTimeout(() => {
-      textarea.focus();
-      const newPos = start + emoji.length;
-      textarea.setSelectionRange(newPos, newPos);
-    }, 0);
-    
-    setShowEmojiPicker(false);
-  };
-
   const clearLogs = async () => {
     try {
       await axios.delete(`${API}/messages/logs`);
