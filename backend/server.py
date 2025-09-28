@@ -232,8 +232,46 @@ async def whatsapp_status():
 
 @api_router.post("/whatsapp/init")
 async def init_whatsapp():
-    success = init_whatsapp_driver()
-    return {"success": success, "message": "WhatsApp driver initialized" if success else "Failed to initialize"}
+    global driver
+    
+    # For demonstration purposes, we'll simulate the WhatsApp connection process
+    # In production, users would need to scan QR code manually
+    
+    try:
+        # Clean up any existing session
+        if driver:
+            try:
+                driver.quit()
+            except:
+                pass
+            driver = None
+        
+        # Try to initialize the driver
+        success = init_whatsapp_driver()
+        
+        if success:
+            return {
+                "success": True, 
+                "message": "WhatsApp initialization started. Please check WhatsApp Web for QR code authentication.",
+                "instructions": [
+                    "1. WhatsApp Web should now be opening in the background",
+                    "2. You'll need to scan the QR code with your WhatsApp mobile app",
+                    "3. Go to WhatsApp on your phone > Settings > Linked Devices > Link a Device",
+                    "4. Scan the QR code to authenticate",
+                    "5. Once connected, you can send bulk messages"
+                ]
+            }
+        else:
+            return {
+                "success": False, 
+                "message": "Failed to initialize WhatsApp. You can use WhatsApp Web manually.",
+                "alternative": "Since you already have WhatsApp Web open, you can use that for testing. The message templates are ready!"
+            }
+    except Exception as e:
+        return {
+            "success": False,
+            "message": f"WhatsApp initialization failed: {str(e)}. Manual WhatsApp Web usage is recommended."
+        }
 
 @api_router.post("/contacts/upload")
 async def upload_contacts(file: UploadFile = File(...)):
