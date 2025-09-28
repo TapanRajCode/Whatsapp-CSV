@@ -1591,7 +1591,7 @@ console.log('Click "💥 START NUCLEAR SEND" or run: enhancedSender.startSending
                           className="bg-red-600 hover:bg-red-700 text-white font-bold"
                           size="sm"
                         >
-                          💥 Copy Nuclear Script
+                          ⚛️ Copy Quantum Script
                         </Button>
                       </div>
                       
