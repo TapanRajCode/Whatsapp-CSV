@@ -29,6 +29,17 @@ const WhatsAppMessenger = () => {
   const [showFormatting, setShowFormatting] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
+  // Common emojis for quick access
+  const commonEmojis = [
+    '😊', '😃', '😄', '😁', '😆', '😅', '😂', '🤣',
+    '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚',
+    '🙂', '🤗', '🤩', '🤔', '🤨', '😐', '😑', '😶',
+    '👋', '👍', '👎', '👌', '🤝', '🙏', '💪', '👏',
+    '🎉', '🎊', '🎈', '🎁', '🏆', '🥇', '⭐', '✨',
+    '❤️', '💙', '💚', '💛', '🧡', '💜', '🖤', '🤍',
+    '🔥', '💯', '✅', '❌', '⚡', '💡', '🚀', '🎯'
+  ];
+
   useEffect(() => {
     checkWhatsAppStatus();
     fetchContacts();
