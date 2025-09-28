@@ -1288,7 +1288,7 @@ console.log('');
 console.log('Click "▶️ START SENDING" or run: enhancedSender.startSending()');`;`;
 
                               navigator.clipboard.writeText(script).then(() => {
-                                alert('🔥 ULTIMATE AUTO-SEND SCRIPT COPIED!\n\nThis version uses:\n• Realistic user simulation\n• Character-by-character typing\n• Multiple keyboard event types\n• Extended wait times\n• Form submission attempts\n\nInstructions:\n1. Open WhatsApp Web\n2. F12 → Console\n3. Paste script → Enter\n4. Click "START"\n\nIf it still doesn\'t work, try Option 2 below for manual assistance!');
+                                alert('🚀 ENHANCED AUTO-SEND SCRIPT 2025 COPIED!\n\nNew Features:\n• Latest WhatsApp Web selectors (data-testid)\n• Human-like typing & mouse simulation\n• Anti-bot detection bypass\n• Multiple send strategies with fallbacks\n• Real-time progress tracking\n• Smart retry mechanisms\n\nInstructions:\n1. Open WhatsApp Web & login\n2. F12 → Console tab\n3. Paste script → Press Enter\n4. Click "▶️ START SENDING"\n\nThis version has significantly higher success rates!');
                               });
                             } catch (error) {
                               alert('Error generating script: ' + error.message);
