@@ -878,16 +878,18 @@ Jane Smith,+0987654321,XYZ Inc
 
                   {/* Instructions */}
                   <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-                    <h4 className="font-medium text-yellow-900 mb-2">📝 How Popup-Free Bulk Sending Works:</h4>
+                    <h4 className="font-medium text-yellow-900 mb-2">📝 How to Send Your Gig Invitations:</h4>
                     <ol className="text-sm text-yellow-800 space-y-1 mb-3">
                       <li><strong>1.</strong> Click "Prepare Bulk Send" to process all your contacts</li>
-                      <li><strong>2.</strong> Use Ctrl+Click (Windows) or Cmd+Click (Mac) on each "Send to [Name]" button</li>
-                      <li><strong>3.</strong> Each tab opens with the personalized message pre-filled</li>
-                      <li><strong>4.</strong> Go through each WhatsApp Web tab and click "Send"</li>
+                      <li><strong>2.</strong> Click "📋 Copy Message" for each contact</li>
+                      <li><strong>3.</strong> Open WhatsApp on your phone</li>
+                      <li><strong>4.</strong> Find the contact and paste the personalized message</li>
+                      <li><strong>5.</strong> Send the message</li>
                     </ol>
                     
-                    <div className="p-2 bg-green-100 rounded text-xs text-green-800">
-                      <strong>✅ No Popup Blocking:</strong> Using Ctrl+Click or Cmd+Click opens tabs in the background without triggering popup blockers. This is the most reliable method for bulk sending.
+                    <div className="p-2 bg-red-100 rounded text-xs text-red-800">
+                      <strong>⚠️ WhatsApp Web Access Issue:</strong> It appears WhatsApp Web is blocked on your network. 
+                      The copy-paste method above will work perfectly with your WhatsApp mobile app instead.
                     </div>
                   </div>
                 </div>
