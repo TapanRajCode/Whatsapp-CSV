@@ -27,7 +27,7 @@ const WhatsAppMessenger = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [connectionInstructions, setConnectionInstructions] = useState(null);
   const [showFormatting, setShowFormatting] = useState(false);
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showMessagePreview, setShowMessagePreview] = useState(true);
 
   // Common emojis for quick access
   const commonEmojis = [
