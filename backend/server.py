@@ -91,40 +91,37 @@ def init_whatsapp_driver():
                 pass
             driver = None
         
-        # Clean up old session directories
-        import shutil
-        session_dirs = ["/tmp/whatsapp-session", "/tmp/whatsapp-session-app"]
-        for session_dir in session_dirs:
-            if os.path.exists(session_dir):
-                try:
-                    shutil.rmtree(session_dir)
-                except:
-                    pass
-        
         chrome_options = Options()
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.add_argument("--disable-gpu")
         chrome_options.add_argument("--window-size=1920,1080")
-        chrome_options.add_argument("--headless")  # Run in headless mode for server
+        # Remove headless mode so we can see WhatsApp Web
+        # chrome_options.add_argument("--headless")
         chrome_options.add_argument("--disable-web-security")
         chrome_options.add_argument("--disable-features=VizDisplayCompositor")
-        # Use a unique session directory for the app
-        chrome_options.add_argument("--user-data-dir=/tmp/whatsapp-session-app")
+        # Use the same user data directory as regular Chrome to access existing session
+        chrome_options.add_argument("--user-data-dir=/tmp/whatsapp-automation")
         
         # Use chromium binary and chromedriver
         chrome_options.binary_location = "/usr/bin/chromium"
         service = Service("/usr/bin/chromedriver")
         
         driver = webdriver.Chrome(service=service, options=chrome_options)
+        
+        # Navigate to WhatsApp Web
+        print("Opening WhatsApp Web...")
         driver.get("https://web.whatsapp.com")
         
         # Wait for page to load
-        time.sleep(5)
+        time.sleep(10)
         
+        print("WhatsApp Web loaded successfully")
         return True
+        
     except Exception as e:
         logging.error(f"Failed to initialize WhatsApp driver: {e}")
+        print(f"WhatsApp driver initialization error: {e}")
         if driver:
             try:
                 driver.quit()
