@@ -81,14 +81,34 @@ class WhatsAppStatus(BaseModel):
 def init_whatsapp_driver():
     global driver
     try:
+        # Clean up any existing driver first
+        if driver:
+            try:
+                driver.quit()
+            except:
+                pass
+            driver = None
+        
+        # Clean up old session directories
+        import shutil
+        session_dirs = ["/tmp/whatsapp-session", "/tmp/whatsapp-session-app"]
+        for session_dir in session_dirs:
+            if os.path.exists(session_dir):
+                try:
+                    shutil.rmtree(session_dir)
+                except:
+                    pass
+        
         chrome_options = Options()
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.add_argument("--disable-gpu")
         chrome_options.add_argument("--window-size=1920,1080")
         chrome_options.add_argument("--headless")  # Run in headless mode for server
-        # Store session data
-        chrome_options.add_argument("--user-data-dir=/tmp/whatsapp-session")
+        chrome_options.add_argument("--disable-web-security")
+        chrome_options.add_argument("--disable-features=VizDisplayCompositor")
+        # Use a unique session directory for the app
+        chrome_options.add_argument("--user-data-dir=/tmp/whatsapp-session-app")
         
         # Use chromium binary and chromedriver
         chrome_options.binary_location = "/usr/bin/chromium"
@@ -96,9 +116,19 @@ def init_whatsapp_driver():
         
         driver = webdriver.Chrome(service=service, options=chrome_options)
         driver.get("https://web.whatsapp.com")
+        
+        # Wait for page to load
+        time.sleep(5)
+        
         return True
     except Exception as e:
         logging.error(f"Failed to initialize WhatsApp driver: {e}")
+        if driver:
+            try:
+                driver.quit()
+            except:
+                pass
+            driver = None
         return False
 
 def check_whatsapp_auth():
