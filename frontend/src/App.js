@@ -239,6 +239,26 @@ const WhatsAppMessenger = () => {
                 </p>
               </div>
             )}
+
+            {connectionInstructions && (
+              <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <h4 className="font-medium text-blue-900 mb-2">📱 Connection Instructions:</h4>
+                <ol className="text-sm text-blue-800 space-y-1">
+                  {connectionInstructions.map((instruction, index) => (
+                    <li key={index} className="flex items-start">
+                      <span className="font-medium mr-2">{typeof instruction === 'string' && instruction.match(/^\d+\./) ? '' : `${index + 1}.`}</span>
+                      <span>{instruction}</span>
+                    </li>
+                  ))}
+                </ol>
+                <button 
+                  onClick={() => setConnectionInstructions(null)}
+                  className="mt-2 text-xs text-blue-600 hover:text-blue-800 underline"
+                >
+                  Dismiss
+                </button>
+              </div>
+            )}
           </CardContent>
         </Card>
 
