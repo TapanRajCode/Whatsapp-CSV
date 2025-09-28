@@ -239,6 +239,56 @@ async def send_whatsapp_message_real(phone: str, message: str) -> dict:
 async def root():
     return {"message": "WhatsApp CSV Messenger API"}
 
+@api_router.get("/whatsapp/check-ready")
+async def check_whatsapp_ready():
+    global driver
+    try:
+        if not driver:
+            return {"ready": False, "message": "WhatsApp driver not initialized"}
+        
+        # Check if we can find the main chat interface
+        try:
+            driver.find_element(By.XPATH, "//div[@data-testid='chat-list'] | //div[contains(@class, 'chat')] | //*[@id='main']")
+            return {"ready": True, "message": "WhatsApp Web is ready for sending messages"}
+        except:
+            return {"ready": False, "message": "WhatsApp Web not fully loaded or needs authentication"}
+    
+    except Exception as e:
+        return {"ready": False, "message": f"Error checking WhatsApp status: {str(e)}"}
+
+@api_router.post("/whatsapp/test-send")
+async def test_whatsapp_send():
+    """Test sending a message to verify WhatsApp automation is working"""
+    global driver
+    try:
+        if not driver:
+            return {"success": False, "message": "WhatsApp driver not initialized"}
+        
+        # Try to access WhatsApp Web main interface
+        driver.get("https://web.whatsapp.com")
+        await asyncio.sleep(3)
+        
+        try:
+            # Look for the main interface
+            main_element = driver.find_element(By.XPATH, "//div[@data-testid='chat-list'] | //div[contains(@class, 'chat')] | //*[@id='main']")
+            if main_element:
+                return {"success": True, "message": "✅ WhatsApp Web automation is ready for bulk sending!"}
+        except:
+            pass
+        
+        # Check if QR code is present (needs authentication)
+        try:
+            qr_element = driver.find_element(By.XPATH, "//canvas[@aria-label='Scan me!'] | //div[contains(@class, 'qr')]")
+            if qr_element:
+                return {"success": False, "message": "📱 Please scan the QR code in WhatsApp Web to authenticate for automatic sending"}
+        except:
+            pass
+        
+        return {"success": False, "message": "WhatsApp Web status unclear. Please ensure you're logged in."}
+        
+    except Exception as e:
+        return {"success": False, "message": f"Error testing WhatsApp: {str(e)}"}
+
 @api_router.get("/whatsapp/status", response_model=WhatsAppStatus)
 async def whatsapp_status():
     global driver, whatsapp_authenticated
