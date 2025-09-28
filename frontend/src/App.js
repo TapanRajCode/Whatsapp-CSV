@@ -601,6 +601,45 @@ Jane Smith,+0987654321,XYZ Inc
                     />
                   </div>
                   
+                  {/* Message Preview */}
+                  {messageTemplate && showMessagePreview && (
+                    <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-medium text-green-900">📱 WhatsApp Preview:</h4>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowMessagePreview(false)}
+                          className="text-xs text-green-600 hover:text-green-800"
+                        >
+                          Hide Preview
+                        </Button>
+                      </div>
+                      <div className="bg-white p-3 rounded-lg border border-green-300 max-w-sm">
+                        <div className="text-sm" dangerouslySetInnerHTML={{ __html: getPreviewMessage() }} />
+                      </div>
+                      <div className="text-xs text-green-600 mt-2">
+                        This is how your message will look in WhatsApp with formatting applied.
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Show Preview Button */}
+                  {messageTemplate && !showMessagePreview && (
+                    <div className="mt-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowMessagePreview(true)}
+                        className="text-xs"
+                      >
+                        📱 Show WhatsApp Preview
+                      </Button>
+                    </div>
+                  )}
+                  
                   <div className="bg-blue-50 p-4 rounded-lg">
                     <h4 className="font-medium mb-2 text-blue-900">Available Placeholders:</h4>
                     <div className="text-sm text-blue-700">
