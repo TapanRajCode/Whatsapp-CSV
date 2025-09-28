@@ -1407,7 +1407,7 @@ if (!document.getElementById('ultra-send-controls')) {
                           <li><strong>2.</strong> Click "🔥 Copy ULTRA Auto-Send Script"</li>
                           <li><strong>3.</strong> In WhatsApp Web, press <kbd>F12</kbd> to open Console</li>
                           <li><strong>4.</strong> Paste the script and press Enter</li>
-                          <li><strong>5.</strong> Click the "🚀 START AUTO-SEND" button that appears</li>
+                          <li><strong>5.</strong> Click the "🚀 START ULTRA SEND" button that appears</li>
                           <li><strong>6.</strong> Watch as messages are sent automatically with no manual clicking!</li>
                         </ol>
                       </div>
