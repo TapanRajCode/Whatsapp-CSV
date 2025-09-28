@@ -776,20 +776,39 @@ Jane Smith,+0987654321,XYZ Inc
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
                             <Badge 
-                              variant={log.status === 'sent' ? 'default' : 'destructive'}
-                              className={log.status === 'sent' ? 'bg-green-500 hover:bg-green-600' : ''}
+                              variant={log.status === 'sent' ? 'default' : log.status === 'ready_for_batch_send' ? 'secondary' : 'destructive'}
+                              className={log.status === 'sent' ? 'bg-green-500 hover:bg-green-600' : 
+                                        log.status === 'ready_for_batch_send' ? 'bg-blue-500 hover:bg-blue-600' : ''}
                             >
-                              {log.status}
+                              {log.status === 'ready_for_batch_send' ? 'Ready to Send' : log.status}
                             </Badge>
                             <span className="font-medium">{log.phone}</span>
                           </div>
-                          <span className="text-sm text-gray-500">
-                            {new Date(log.created_at).toLocaleString()}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-gray-500">
+                              {new Date(log.created_at).toLocaleString()}
+                            </span>
+                            {log.status === 'ready_for_batch_send' && log.error_message && (
+                              <Button
+                                onClick={() => window.open(log.error_message, '_blank')}
+                                size="sm"
+                                className="bg-green-600 hover:bg-green-700 text-white"
+                              >
+                                📱 Send Now
+                              </Button>
+                            )}
+                          </div>
                         </div>
-                        <p className="text-sm text-gray-700 mb-2">{log.message}</p>
-                        {log.error_message && (
-                          <p className="text-sm text-red-600">Error: {log.error_message}</p>
+                        <div className="bg-gray-50 p-3 rounded mb-2">
+                          <p className="text-sm text-gray-700 whitespace-pre-wrap">{log.message}</p>
+                        </div>
+                        {log.status === 'ready_for_batch_send' && (
+                          <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded">
+                            💡 Click "📱 Send Now" to open WhatsApp Web with this message pre-filled for instant sending!
+                          </div>
+                        )}
+                        {log.error_message && log.status !== 'ready_for_batch_send' && (
+                          <p className="text-sm text-red-600 mt-2">Error: {log.error_message}</p>
                         )}
                       </div>
                     ))}
