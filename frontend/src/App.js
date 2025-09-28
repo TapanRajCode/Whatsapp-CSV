@@ -1389,10 +1389,10 @@ control.style.cssText = \`
 
 control.innerHTML = \`
   <div style="font-size: 20px; font-weight: bold; margin-bottom: 5px;">
-    🚀 ENHANCED SENDER 2025
+    🚀 ULTRA-ENHANCED SENDER 2025
   </div>
   <div style="font-size: 12px; margin-bottom: 15px; opacity: 0.9;">
-    Latest selectors • Human simulation • Auto-retry
+    Perfect event sequence • Advanced AI detection • Auto-retry
   </div>
   
   <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px; margin-bottom: 15px;">
@@ -1410,7 +1410,7 @@ control.innerHTML = \`
     box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
     transition: transform 0.2s;
   " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-    ▶️ START SENDING
+    ⚡ START ULTRA SEND
   </button>
   
   <button id="enhanced-stop" style="
@@ -1425,7 +1425,7 @@ control.innerHTML = \`
   </button>
   
   <div style="font-size: 11px; margin-top: 10px; opacity: 0.8; line-height: 1.4;">
-    Using 2025 WhatsApp Web selectors with human-like automation
+    Using perfect event sequences with pointer/mouse events
   </div>
 \`;
 
@@ -1434,15 +1434,16 @@ document.body.appendChild(control);
 document.getElementById('enhanced-start').onclick = () => enhancedSender.startSending();
 document.getElementById('enhanced-stop').onclick = () => enhancedSender.stop();
 
-console.log('🚀 ENHANCED SENDER 2025 READY!');
-console.log('Features:');
-console.log('• Latest WhatsApp Web selectors (data-testid)');
-console.log('• Human-like typing and mouse simulation');  
-console.log('• Multiple send strategies with fallbacks');
-console.log('• Anti-detection randomization');
-console.log('• Real-time progress tracking');
+console.log('🚀 ULTRA-ENHANCED SENDER 2025 READY!');
+console.log('NEW Features:');
+console.log('• Perfect pointer/mouse event sequences (focus→pointerdown→mousedown→pointerup→mouseup→click)');
+console.log('• Advanced AI-like send button detection');
+console.log('• Send button activity monitoring');
+console.log('• Enhanced position and context analysis');  
+console.log('• Modern browser compatibility (PointerEvents)');
+console.log('• Multiple fallback strategies');
 console.log('');
-console.log('Click "▶️ START SENDING" or run: enhancedSender.startSending()')`;
+console.log('Click "⚡ START ULTRA SEND" or run: enhancedSender.startSending()')`;
 
                               // Fallback clipboard function
                               const fallbackCopyToClipboard = (text) => {
