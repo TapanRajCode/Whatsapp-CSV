@@ -703,6 +703,140 @@ Jane Smith,+0987654321,XYZ Inc
             </Card>
           </TabsContent>
 
+          <TabsContent value="bulk-send" className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Send className="h-5 w-5 text-emerald-600" />
+                  Bulk Message Sending
+                </CardTitle>
+                <CardDescription>
+                  Send your personalized messages to all contacts automatically via WhatsApp Web
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  {/* Status Check */}
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <h4 className="font-medium mb-2">📋 Pre-Send Checklist:</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center gap-2">
+                        {contacts.length > 0 ? (
+                          <CheckCircle2 className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <AlertCircle className="h-4 w-4 text-red-500" />
+                        )}
+                        <span className={contacts.length > 0 ? 'text-green-700' : 'text-red-700'}>
+                          {contacts.length} contacts uploaded
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {messageTemplate.trim() ? (
+                          <CheckCircle2 className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <AlertCircle className="h-4 w-4 text-red-500" />
+                        )}
+                        <span className={messageTemplate.trim() ? 'text-green-700' : 'text-red-700'}>
+                          Message template created
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {whatsappStatus.authenticated || whatsappManualOverride ? (
+                          <CheckCircle2 className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <AlertCircle className="h-4 w-4 text-red-500" />
+                        )}
+                        <span className={(whatsappStatus.authenticated || whatsappManualOverride) ? 'text-green-700' : 'text-red-700'}>
+                          WhatsApp connection ready
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Bulk Send Actions */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-4 bg-emerald-50 rounded-lg border-l-4 border-l-emerald-500">
+                      <div>
+                        <h4 className="font-medium text-emerald-900">🚀 Ready for Bulk Sending</h4>
+                        <p className="text-sm text-emerald-700 mt-1">
+                          Send personalized messages to all {contacts.length} contacts at once
+                        </p>
+                      </div>
+                      <Button
+                        onClick={sendBulkMessages}
+                        disabled={!(whatsappStatus.authenticated || whatsappManualOverride) || contacts.length === 0 || !messageTemplate.trim() || sendingProgress.active}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                        size="lg"
+                      >
+                        <Send className="h-4 w-4 mr-2" />
+                        Prepare Bulk Send
+                      </Button>
+                    </div>
+
+                    {/* Send All Button - Only show if messages are ready */}
+                    {messageLogs.some(log => log.status === 'ready_for_batch_send') && (
+                      <div className="p-4 bg-blue-50 rounded-lg border-l-4 border-l-blue-500">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="font-medium text-blue-900">📱 Messages Ready to Send</h4>
+                            <p className="text-sm text-blue-700 mt-1">
+                              {messageLogs.filter(log => log.status === 'ready_for_batch_send').length} personalized messages are prepared and ready
+                            </p>
+                          </div>
+                          <Button
+                            onClick={() => {
+                              const readyMessages = messageLogs.filter(log => log.status === 'ready_for_batch_send' && log.error_message);
+                              readyMessages.forEach((log, index) => {
+                                setTimeout(() => {
+                                  window.open(log.error_message, '_blank');
+                                }, index * 1000); // 1 second delay between each
+                              });
+                            }}
+                            className="bg-blue-600 hover:bg-blue-700 text-white"
+                            size="lg"
+                          >
+                            🚀 Send All ({messageLogs.filter(log => log.status === 'ready_for_batch_send').length})
+                          </Button>
+                        </div>
+                        <div className="mt-3 text-xs text-blue-600">
+                          💡 This will open WhatsApp Web tabs for each contact with messages pre-filled. Just click Send in each tab!
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Progress Display */}
+                    {sendingProgress.active && (
+                      <div className="space-y-2">
+                        <Progress value={sendingProgress.progress} className="w-full" />
+                        <p className="text-sm text-gray-600 text-center">{sendingProgress.message}</p>
+                      </div>
+                    )}
+
+                    {sendingProgress.message && !sendingProgress.active && (
+                      <Alert className="border-emerald-200 bg-emerald-50">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                        <AlertDescription className="text-emerald-700">
+                          {sendingProgress.message}
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                  </div>
+
+                  {/* Instructions */}
+                  <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                    <h4 className="font-medium text-yellow-900 mb-2">📝 How Bulk Sending Works:</h4>
+                    <ol className="text-sm text-yellow-800 space-y-1">
+                      <li><strong>1.</strong> Click "Prepare Bulk Send" to process all your contacts</li>
+                      <li><strong>2.</strong> Click "Send All" to open WhatsApp Web tabs for each contact</li>
+                      <li><strong>3.</strong> Each tab opens with the personalized message pre-filled</li>
+                      <li><strong>4.</strong> Simply click "Send" in each WhatsApp Web tab</li>
+                    </ol>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           <TabsContent value="contacts" className="mt-6">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
