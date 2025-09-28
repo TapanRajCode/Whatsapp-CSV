@@ -342,14 +342,42 @@ const WhatsAppMessenger = () => {
               </div>
               <span className="text-sm text-gray-600">{whatsappStatus.message}</span>
             </div>
-            {!whatsappStatus.authenticated && (
+            {!whatsappStatus.authenticated && !whatsappManualOverride && (
               <div className="mt-4">
-                <Button onClick={initWhatsApp} className="bg-emerald-600 hover:bg-emerald-700">
-                  Connect WhatsApp
-                </Button>
+                <div className="flex flex-wrap gap-2">
+                  <Button onClick={initWhatsApp} className="bg-emerald-600 hover:bg-emerald-700">
+                    Connect WhatsApp
+                  </Button>
+                  <Button 
+                    onClick={() => setWhatsappManualOverride(true)} 
+                    variant="outline" 
+                    className="border-blue-500 text-blue-600 hover:bg-blue-50"
+                  >
+                    ✅ I Already Have WhatsApp Web Open
+                  </Button>
+                </div>
                 <p className="text-sm text-gray-500 mt-2">
-                  Click to open WhatsApp Web and scan the QR code with your phone
+                  Click "Connect WhatsApp" to scan QR code, or click "I Already Have WhatsApp Web Open" if you're already logged in elsewhere
                 </p>
+              </div>
+            )}
+
+            {whatsappManualOverride && (
+              <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-green-800 font-medium">✅ WhatsApp marked as connected!</p>
+                    <p className="text-xs text-green-600 mt-1">You can now send real messages using your existing WhatsApp Web session</p>
+                  </div>
+                  <Button 
+                    onClick={() => setWhatsappManualOverride(false)}
+                    variant="ghost"
+                    size="sm"
+                    className="text-green-600 hover:text-green-800"
+                  >
+                    Reset
+                  </Button>
+                </div>
               </div>
             )}
 
