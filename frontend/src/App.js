@@ -1469,7 +1469,7 @@ control.style.cssText = \`
 
 control.innerHTML = \`
   <div style="font-size: 20px; font-weight: bold; margin-bottom: 5px;">
-    🚀 ULTRA-ENHANCED SENDER 2025
+    💥 NUCLEAR SENDER 2025
   </div>
   <div style="font-size: 12px; margin-bottom: 15px; opacity: 0.9;">
     Perfect event sequence • Advanced AI detection • Auto-retry
