@@ -565,7 +565,8 @@ Jane Smith,+0987654321,XYZ Inc
                           </Button>
                         </div>
                         <div className="text-xs text-gray-500 mt-2">
-                          Select text first, then click formatting button. Or click to insert template.
+                          💡 **How it works:** Select text and click formatting to add WhatsApp syntax. 
+                          Check the preview below to see how it will look when sent!
                         </div>
                       </div>
                     )}
