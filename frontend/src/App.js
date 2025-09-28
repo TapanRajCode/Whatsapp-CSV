@@ -791,16 +791,17 @@ Jane Smith,+0987654321,XYZ Inc
                               
                               const script = `
 console.clear();
-console.log('🔥 ULTIMATE WhatsApp Sender - User Simulation Mode');
+console.log('🚀 ENHANCED WhatsApp Sender 2025 - Human Simulation Mode');
 
 const contacts = ${JSON.stringify(cleanContacts, null, 2)};
 const messageTemplate = \`${messageTemplate}\`;
 
-class UltimateWhatsAppSender {
+class EnhancedWhatsAppSender {
   constructor() {
     this.isRunning = false;
     this.successCount = 0;
     this.failCount = 0;
+    this.currentContactIndex = 0;
   }
 
   formatPhone(phone) {
@@ -812,25 +813,77 @@ class UltimateWhatsAppSender {
   }
 
   personalizeMessage(template, contact) {
-    return template.replace(/{name}/g, contact.name);
+    let message = template.replace(/{name}/g, contact.name);
+    // Handle additional fields
+    if (contact.additional_fields) {
+      Object.keys(contact.additional_fields).forEach(field => {
+        const placeholder = new RegExp(\`{\${field}}\`, 'g');
+        message = message.replace(placeholder, contact.additional_fields[field]);
+      });
+    }
+    return message;
+  }
+
+  // Generate random delay to mimic human behavior
+  randomDelay(min = 50, max = 200) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
   sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  // Simulate realistic user typing
-  async simulateTyping(element, text) {
+  // Human-like mouse movement simulation
+  async humanMouseMove(element) {
+    const rect = element.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    // Add slight randomness to click position
+    const offsetX = (Math.random() - 0.5) * 10;
+    const offsetY = (Math.random() - 0.5) * 10;
+    
+    const mouseEvent = new MouseEvent('mouseover', {
+      clientX: centerX + offsetX,
+      clientY: centerY + offsetY,
+      bubbles: true
+    });
+    element.dispatchEvent(mouseEvent);
+    await this.sleep(this.randomDelay(50, 150));
+  }
+
+  // Enhanced human-like typing simulation
+  async humanTyping(element, text) {
     element.focus();
-    element.click();
+    await this.sleep(this.randomDelay(100, 300));
     
-    // Clear existing content
-    element.innerHTML = '';
+    // Clear existing content with backspace simulation
+    if (element.textContent && element.textContent.trim() !== '') {
+      const deleteEvents = [
+        new KeyboardEvent('keydown', { key: 'Backspace', keyCode: 8, bubbles: true }),
+        new KeyboardEvent('keyup', { key: 'Backspace', keyCode: 8, bubbles: true })
+      ];
+      
+      for (let i = 0; i < element.textContent.length; i++) {
+        deleteEvents.forEach(event => element.dispatchEvent(event));
+        await this.sleep(this.randomDelay(10, 30));
+      }
+    }
+    
+    // Clear element content
     element.textContent = '';
+    element.innerHTML = '';
     
-    // Simulate typing each character
+    // Type each character with human-like delays
     for (let i = 0; i < text.length; i++) {
       const char = text[i];
+      
+      // Simulate keydown, keypress, keyup for each character
+      const keyEvents = [
+        new KeyboardEvent('keydown', { key: char, bubbles: true }),
+        new KeyboardEvent('keypress', { key: char, bubbles: true }),
+        new KeyboardEvent('keyup', { key: char, bubbles: true })
+      ];
       
       // Add character to element
       if (char === '\\n') {
@@ -839,131 +892,224 @@ class UltimateWhatsAppSender {
         element.textContent += char;
       }
       
-      // Trigger input events
-      element.dispatchEvent(new Event('input', { bubbles: true }));
-      element.dispatchEvent(new Event('change', { bubbles: true }));
+      // Dispatch keyboard events
+      keyEvents.forEach(event => element.dispatchEvent(event));
       
-      await this.sleep(30); // Small delay between characters
+      // Trigger input and change events
+      const inputEvent = new Event('input', { bubbles: true });
+      const changeEvent = new Event('change', { bubbles: true });
+      element.dispatchEvent(inputEvent);
+      element.dispatchEvent(changeEvent);
+      
+      // Human-like delay between keystrokes (varies based on character)
+      let delay = this.randomDelay(80, 200);
+      if (char === ' ') delay = this.randomDelay(150, 350); // Longer pause for spaces
+      if (char === '.' || char === ',' || char === '!') delay = this.randomDelay(200, 400);
+      
+      await this.sleep(delay);
     }
   }
 
-  // Ultimate send attempt
-  async ultimateSendAttempt() {
-    console.log('🚀 Starting ultimate send attempt...');
-    
-    await this.sleep(2000);
-    
-    // Find message input
-    const inputSelectors = [
-      'div[contenteditable="true"][data-tab="10"]',
-      'div[contenteditable="true"]',
-      'div[role="textbox"]',
-      '[data-testid="conversation-compose-box-input"]'
+  // Enhanced send button detection using 2025 selectors
+  async findSendButton() {
+    // Latest WhatsApp Web send button selectors (2024-2025)
+    const sendButtonSelectors = [
+      'button[data-testid="compose-btn-send"]', // Primary 2025 selector
+      'button[data-testid="send"]', // Alternative 2025 selector
+      'span[data-testid="send"]', // Sometimes it's a span
+      'button[aria-label="Send"]',
+      'div[role="button"][data-testid*="send"]',
+      'button[title="Send"]',
+      '[data-icon="send"]',
+      'button svg[data-icon="send"]'
     ];
     
-    let messageInput = null;
-    for (const selector of inputSelectors) {
-      messageInput = document.querySelector(selector);
-      if (messageInput) break;
-    }
-    
-    if (!messageInput) {
-      console.log('❌ Could not find message input');
-      return false;
-    }
-    
-    console.log('✅ Found message input');
-    
-    // Method 1: Simulate Enter key press
-    console.log('🎯 Method 1: Realistic Enter key simulation');
-    messageInput.focus();
-    
-    const events = [
-      new KeyboardEvent('keydown', { key: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true }),
-      new KeyboardEvent('keypress', { key: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true }),
-      new KeyboardEvent('keyup', { key: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true })
-    ];
-    
-    for (const event of events) {
-      messageInput.dispatchEvent(event);
-      await this.sleep(100);
-    }
-    
-    await this.sleep(2000);
-    if (await this.checkMessageSent()) return true;
-    
-    // Method 2: Simulate user click sequence
-    console.log('🎯 Method 2: Simulated user clicks');
-    const allButtons = document.querySelectorAll('button, div[role="button"], span');
-    
-    for (const button of allButtons) {
-      if (this.isInBottomArea(button) && this.hassSendIndicator(button)) {
-        console.log('Trying button:', button.outerHTML.substring(0, 100));
-        
-        // Simulate realistic click sequence
-        button.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
-        await this.sleep(50);
-        button.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
-        await this.sleep(50);
-        button.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-        
-        await this.sleep(2000);
-        if (await this.checkMessageSent()) return true;
+    for (const selector of sendButtonSelectors) {
+      const buttons = document.querySelectorAll(selector);
+      for (const button of buttons) {
+        if (this.isVisibleAndClickable(button)) {
+          console.log(\`✅ Found send button with selector: \${selector}\`);
+          return button;
+        }
       }
     }
     
-    // Method 3: Form submission simulation
-    console.log('🎯 Method 3: Form submission');
-    const forms = document.querySelectorAll('form');
-    for (const form of forms) {
-      try {
-        form.submit();
-        await this.sleep(2000);
-        if (await this.checkMessageSent()) return true;
-      } catch (e) {}
+    // Fallback: search by visual characteristics
+    const allButtons = document.querySelectorAll('button, div[role="button"], span[role="button"]');
+    for (const button of allButtons) {
+      if (this.isSendButtonByContext(button)) {
+        console.log('✅ Found send button by context analysis');
+        return button;
+      }
     }
     
-    // Method 4: Programmatic send
-    console.log('🎯 Method 4: Programmatic send attempt');
-    if (window.Store && window.Store.SendMessage) {
-      try {
-        // This is for older WhatsApp Web versions
-        await window.Store.SendMessage();
-        await this.sleep(2000);
-        if (await this.checkMessageSent()) return true;
-      } catch (e) {}
-    }
-    
-    return false;
+    return null;
   }
 
-  isInBottomArea(element) {
+  isVisibleAndClickable(element) {
+    if (!element || !element.offsetParent) return false;
+    const rect = element.getBoundingClientRect();
+    return rect.width > 0 && rect.height > 0 && 
+           rect.top >= 0 && rect.left >= 0;
+  }
+
+  isSendButtonByContext(element) {
+    if (!this.isVisibleAndClickable(element)) return false;
+    
+    // Check if button is in the compose area (bottom of screen)
     const rect = element.getBoundingClientRect();
     const windowHeight = window.innerHeight;
-    return rect.top > windowHeight * 0.6;
+    if (rect.top < windowHeight * 0.7) return false;
+    
+    // Check for send-related attributes or content
+    const hasIcon = element.querySelector('svg');
+    const dataIcon = element.getAttribute('data-icon');
+    const ariaLabel = element.getAttribute('aria-label');
+    const title = element.getAttribute('title');
+    
+    return hasIcon && (
+      (dataIcon && dataIcon.includes('send')) ||
+      (ariaLabel && ariaLabel.toLowerCase().includes('send')) ||
+      (title && title.toLowerCase().includes('send'))
+    );
   }
 
-  hassSendIndicator(element) {
-    const text = (element.textContent || '').toLowerCase();
-    const hasIcon = element.querySelector('svg, [data-icon], [data-testid]');
-    const classList = Array.from(element.classList).join(' ').toLowerCase();
+  // Find message input using latest selectors
+  async findMessageInput() {
+    const inputSelectors = [
+      'div[contenteditable="true"][data-testid="conversation-compose-box-input"]', // 2025 primary
+      'div[contenteditable="true"][data-tab="10"]', // Legacy but still used
+      'div[contenteditable="true"][role="textbox"]',
+      'div[contenteditable="true"]', // Fallback
+      '[data-testid="conversation-compose-box-input"]'
+    ];
     
-    return hasIcon || text.includes('send') || classList.includes('send');
+    for (const selector of inputSelectors) {
+      const input = document.querySelector(selector);
+      if (input && this.isVisibleAndClickable(input)) {
+        console.log(\`✅ Found input with selector: \${selector}\`);
+        return input;
+      }
+    }
+    
+    return null;
+  }
+
+  // Enhanced send attempt with multiple strategies
+  async enhancedSendAttempt() {
+    console.log('🚀 Starting enhanced send attempt...');
+    
+    // Wait for page to fully load
+    await this.sleep(3000);
+    
+    // Strategy 1: Direct send button click (most reliable)
+    console.log('🎯 Strategy 1: Direct send button click');
+    const sendButton = await this.findSendButton();
+    if (sendButton) {
+      await this.humanMouseMove(sendButton);
+      await this.sleep(this.randomDelay(200, 500));
+      
+      // Human-like click sequence
+      sendButton.dispatchEvent(new MouseEvent('mousedown', { 
+        bubbles: true, cancelable: true,
+        clientX: sendButton.getBoundingClientRect().left + sendButton.getBoundingClientRect().width / 2,
+        clientY: sendButton.getBoundingClientRect().top + sendButton.getBoundingClientRect().height / 2
+      }));
+      await this.sleep(this.randomDelay(50, 150));
+      
+      sendButton.dispatchEvent(new MouseEvent('mouseup', { 
+        bubbles: true, cancelable: true 
+      }));
+      await this.sleep(this.randomDelay(30, 80));
+      
+      sendButton.dispatchEvent(new MouseEvent('click', { 
+        bubbles: true, cancelable: true 
+      }));
+      
+      await this.sleep(2000);
+      if (await this.checkMessageSent()) {
+        console.log('✅ Success with direct button click!');
+        return true;
+      }
+    }
+    
+    // Strategy 2: Enter key simulation on message input
+    console.log('🎯 Strategy 2: Enter key on message input');
+    const messageInput = await this.findMessageInput();
+    if (messageInput) {
+      messageInput.focus();
+      await this.sleep(this.randomDelay(100, 200));
+      
+      // Comprehensive Enter key event sequence
+      const enterEvents = [
+        new KeyboardEvent('keydown', { 
+          key: 'Enter', code: 'Enter', keyCode: 13, which: 13, 
+          bubbles: true, cancelable: true 
+        }),
+        new KeyboardEvent('keypress', { 
+          key: 'Enter', code: 'Enter', keyCode: 13, which: 13, 
+          bubbles: true, cancelable: true 
+        }),
+        new KeyboardEvent('keyup', { 
+          key: 'Enter', code: 'Enter', keyCode: 13, which: 13, 
+          bubbles: true, cancelable: true 
+        })
+      ];
+      
+      for (const event of enterEvents) {
+        messageInput.dispatchEvent(event);
+        await this.sleep(this.randomDelay(30, 80));
+      }
+      
+      await this.sleep(2000);
+      if (await this.checkMessageSent()) {
+        console.log('✅ Success with Enter key!');
+        return true;
+      }
+    }
+    
+    // Strategy 3: Form submission
+    console.log('🎯 Strategy 3: Form submission');
+    const form = document.querySelector('form');
+    if (form) {
+      try {
+        const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+        form.dispatchEvent(submitEvent);
+        await this.sleep(2000);
+        if (await this.checkMessageSent()) {
+          console.log('✅ Success with form submission!');
+          return true;
+        }
+      } catch (e) {
+        console.log('Form submission failed:', e);
+      }
+    }
+    
+    console.log('❌ All send strategies failed');
+    return false;
   }
 
   async checkMessageSent() {
     const inputSelectors = [
+      'div[contenteditable="true"][data-testid="conversation-compose-box-input"]',
       'div[contenteditable="true"][data-tab="10"]',
-      'div[contenteditable="true"]',
-      'div[role="textbox"]'
+      'div[contenteditable="true"]'
     ];
     
     for (const selector of inputSelectors) {
       const input = document.querySelector(selector);
       if (input) {
-        const isEmpty = !input.textContent || input.textContent.trim() === '' || 
-                       input.innerHTML === '<br>' || input.innerHTML === '';
-        return isEmpty;
+        const isEmpty = !input.textContent || 
+                       input.textContent.trim() === '' || 
+                       input.innerHTML === '<br>' || 
+                       input.innerHTML === '<div><br></div>' ||
+                       input.innerHTML === '';
+        
+        // Also check for placeholder text restoration
+        const hasPlaceholder = input.getAttribute('data-tab') || 
+                              input.querySelector('[data-testid]');
+        
+        return isEmpty && !input.classList.contains('typing');
       }
     }
     return false;
@@ -973,91 +1119,173 @@ class UltimateWhatsAppSender {
     const phone = this.formatPhone(contact.phone);
     const message = this.personalizeMessage(messageTemplate, contact);
     
-    console.log(\`\\n🎯 ULTIMATE SEND: \${contact.name} (\${phone})\`);
+    console.log(\`\\n🎯 ENHANCED SEND: \${contact.name} (\${phone})\`);
+    console.log(\`📝 Message: \${message.substring(0, 100)}...\`);
     
+    // Navigate to contact with message
     const url = \`https://web.whatsapp.com/send?phone=91\${phone}&text=\${encodeURIComponent(message)}\`;
     window.location.href = url;
     
-    // Extended wait for page load
-    await this.sleep(8000);
+    // Extended wait for page load and WhatsApp processing
+    await this.sleep(10000);
     
-    const success = await this.ultimateSendAttempt();
+    // Try enhanced send
+    const success = await this.enhancedSendAttempt();
     
     if (success) {
       console.log(\`✅ SUCCESS: \${contact.name}\`);
       this.successCount++;
     } else {
-      console.log(\`❌ FAILED: \${contact.name} - Manual send required\`);
+      console.log(\`❌ FAILED: \${contact.name} - All strategies failed\`);
       this.failCount++;
     }
+    
+    // Update control panel
+    this.updateControlPanel();
     
     return success;
   }
 
   async startSending() {
-    if (this.isRunning) return;
-    this.isRunning = true;
+    if (this.isRunning) {
+      console.log('Already running!');
+      return;
+    }
     
-    console.log('🔥 STARTING ULTIMATE SEND SEQUENCE');
+    this.isRunning = true;
+    this.currentContactIndex = 0;
+    
+    console.log('🚀 STARTING ENHANCED SEND SEQUENCE');
+    console.log(\`📊 Total contacts: \${contacts.length}\`);
     
     for (let i = 0; i < contacts.length; i++) {
-      if (!this.isRunning) break;
+      if (!this.isRunning) {
+        console.log('⏹️ Stopped by user');
+        break;
+      }
       
+      this.currentContactIndex = i;
       console.log(\`\\n📱 Contact \${i+1}/\${contacts.length}\`);
+      
+      const startTime = Date.now();
       await this.sendToContact(contacts[i]);
+      const endTime = Date.now();
+      
+      console.log(\`⏱️ Time taken: \${((endTime - startTime) / 1000).toFixed(1)}s\`);
       
       if (i < contacts.length - 1) {
-        console.log('⏳ Waiting 15 seconds...');
-        await this.sleep(15000);
+        const waitTime = this.randomDelay(8000, 15000);
+        console.log(\`⏳ Waiting \${(waitTime/1000).toFixed(1)} seconds before next contact...\`);
+        await this.sleep(waitTime);
       }
     }
     
-    console.log('\\n🏁 ULTIMATE SEND COMPLETE');
-    console.log(\`✅ Success: \${this.successCount}\`);
-    console.log(\`❌ Failed: \${this.failCount}\`);
+    console.log('\\n🏁 ENHANCED SEND COMPLETE');
+    console.log(\`✅ Success: \${this.successCount}/\${contacts.length}\`);
+    console.log(\`❌ Failed: \${this.failCount}/\${contacts.length}\`);
+    console.log(\`📊 Success Rate: \${((this.successCount/contacts.length)*100).toFixed(1)}%\`);
+    
     this.isRunning = false;
+    this.updateControlPanel();
   }
 
   stop() {
+    console.log('🛑 Stopping sender...');
     this.isRunning = false;
+    this.updateControlPanel();
+  }
+
+  updateControlPanel() {
+    const statusEl = document.getElementById('sender-status');
+    const progressEl = document.getElementById('sender-progress');
+    
+    if (statusEl) {
+      if (!this.isRunning && this.currentContactIndex === 0) {
+        statusEl.textContent = 'Ready to start';
+      } else if (this.isRunning) {
+        statusEl.textContent = \`Sending \${this.currentContactIndex + 1}/\${contacts.length}\`;
+      } else {
+        statusEl.textContent = \`Complete: \${this.successCount}✅ \${this.failCount}❌\`;
+      }
+    }
+    
+    if (progressEl && contacts.length > 0) {
+      const progress = ((this.currentContactIndex + 1) / contacts.length) * 100;
+      progressEl.style.width = progress + '%';
+    }
   }
 }
 
-window.ultimateSender = new UltimateWhatsAppSender();
+window.enhancedSender = new EnhancedWhatsAppSender();
 
-// Create control
+// Create enhanced control panel
 const control = document.createElement('div');
 control.style.cssText = \`
-  position: fixed; top: 20px; right: 20px; z-index: 9999;
-  background: linear-gradient(45deg, #ff6b6b, #ffd93d);
-  padding: 20px; border-radius: 15px;
-  color: white; font-weight: bold; text-align: center;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  position: fixed; top: 20px; right: 20px; z-index: 99999;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 25px; border-radius: 20px; color: white;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  border: 3px solid rgba(255,255,255,0.2); min-width: 320px;
+  backdrop-filter: blur(10px);
 \`;
 
 control.innerHTML = \`
-  <div style="margin-bottom: 10px;">🔥 ULTIMATE SENDER</div>
-  <button id="ultimate-start" style="
-    background: white; color: #ff6b6b;
-    border: none; padding: 10px 20px;
-    border-radius: 8px; cursor: pointer;
-    font-weight: bold; margin-right: 10px;
-  ">START</button>
-  <button id="ultimate-stop" style="
-    background: #333; color: white;
-    border: none; padding: 10px 20px;
-    border-radius: 8px; cursor: pointer;
-    font-weight: bold;
-  ">STOP</button>
+  <div style="font-size: 20px; font-weight: bold; margin-bottom: 5px;">
+    🚀 ENHANCED SENDER 2025
+  </div>
+  <div style="font-size: 12px; margin-bottom: 15px; opacity: 0.9;">
+    Latest selectors • Human simulation • Auto-retry
+  </div>
+  
+  <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px; margin-bottom: 15px;">
+    <div id="sender-status" style="font-size: 14px; font-weight: bold;">Ready to start</div>
+    <div style="background: rgba(255,255,255,0.2); height: 4px; border-radius: 2px; margin-top: 8px; overflow: hidden;">
+      <div id="sender-progress" style="background: #4CAF50; height: 100%; width: 0%; transition: width 0.3s;"></div>
+    </div>
+  </div>
+  
+  <button id="enhanced-start" style="
+    background: linear-gradient(45deg, #4CAF50, #45a049);
+    color: white; border: none; padding: 12px 24px;
+    border-radius: 10px; cursor: pointer; font-weight: bold;
+    font-size: 14px; margin-right: 10px; margin-bottom: 8px;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+    transition: transform 0.2s;
+  " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+    ▶️ START SENDING
+  </button>
+  
+  <button id="enhanced-stop" style="
+    background: linear-gradient(45deg, #f44336, #d32f2f);
+    color: white; border: none; padding: 12px 24px;
+    border-radius: 10px; cursor: pointer; font-weight: bold;
+    font-size: 14px; margin-bottom: 8px;
+    box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+    transition: transform 0.2s;
+  " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+    ⏹️ STOP
+  </button>
+  
+  <div style="font-size: 11px; margin-top: 10px; opacity: 0.8; line-height: 1.4;">
+    Using 2025 WhatsApp Web selectors with human-like automation
+  </div>
 \`;
 
 document.body.appendChild(control);
 
-document.getElementById('ultimate-start').onclick = () => ultimateSender.startSending();
-document.getElementById('ultimate-stop').onclick = () => ultimateSender.stop();
+document.getElementById('enhanced-start').onclick = () => enhancedSender.startSending();
+document.getElementById('enhanced-stop').onclick = () => enhancedSender.stop();
 
-console.log('🔥 ULTIMATE SENDER READY!');
-console.log('Click START button or run: ultimateSender.startSending()');`;
+console.log('🚀 ENHANCED SENDER 2025 READY!');
+console.log('Features:');
+console.log('• Latest WhatsApp Web selectors (data-testid)');
+console.log('• Human-like typing and mouse simulation');  
+console.log('• Multiple send strategies with fallbacks');
+console.log('• Anti-detection randomization');
+console.log('• Real-time progress tracking');
+console.log('');
+console.log('Click "▶️ START SENDING" or run: enhancedSender.startSending()');`;`;
 
                               navigator.clipboard.writeText(script).then(() => {
                                 alert('🔥 ULTIMATE AUTO-SEND SCRIPT COPIED!\n\nThis version uses:\n• Realistic user simulation\n• Character-by-character typing\n• Multiple keyboard event types\n• Extended wait times\n• Form submission attempts\n\nInstructions:\n1. Open WhatsApp Web\n2. F12 → Console\n3. Paste script → Enter\n4. Click "START"\n\nIf it still doesn\'t work, try Option 2 below for manual assistance!');
