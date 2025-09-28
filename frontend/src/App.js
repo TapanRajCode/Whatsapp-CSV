@@ -777,8 +777,8 @@ Jane Smith,+0987654321,XYZ Inc
                     <div className="space-y-3">
                       <div className="flex items-center justify-between p-3 bg-white rounded border">
                         <div>
-                          <h5 className="font-medium">Option 1: Nuclear Auto-Send 2025</h5>
-                          <p className="text-sm text-gray-600">Green button hunting • SVG detection • Nuclear click sequences</p>
+                          <h5 className="font-medium">Option 1: Quantum Auto-Send 2025</h5>
+                          <p className="text-sm text-gray-600">React hijacking • WhatsApp Store access • DOM manipulation</p>
                         </div>
                         <Button
                           onClick={async () => {
