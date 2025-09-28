@@ -90,10 +90,11 @@ def init_whatsapp_driver():
         # Store session data
         chrome_options.add_argument("--user-data-dir=/tmp/whatsapp-session")
         
-        # Use chromium binary
+        # Use chromium binary and chromedriver
         chrome_options.binary_location = "/usr/bin/chromium"
+        service = Service("/usr/bin/chromedriver")
         
-        driver = webdriver.Chrome(options=chrome_options)
+        driver = webdriver.Chrome(service=service, options=chrome_options)
         driver.get("https://web.whatsapp.com")
         return True
     except Exception as e:
