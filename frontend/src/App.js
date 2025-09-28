@@ -1404,7 +1404,7 @@ if (!document.getElementById('ultra-send-controls')) {
                         <h5 className="font-medium text-yellow-900 mb-2">📝 How to Use:</h5>
                         <ol className="text-sm text-yellow-800 space-y-1">
                           <li><strong>1.</strong> Click "📱 Open WhatsApp Web" and log in</li>
-                          <li><strong>2.</strong> Click "📋 Copy Enhanced Auto-Send Script"</li>
+                          <li><strong>2.</strong> Click "🔥 Copy ULTRA Auto-Send Script"</li>
                           <li><strong>3.</strong> In WhatsApp Web, press <kbd>F12</kbd> to open Console</li>
                           <li><strong>4.</strong> Paste the script and press Enter</li>
                           <li><strong>5.</strong> Click the "🚀 START AUTO-SEND" button that appears</li>
