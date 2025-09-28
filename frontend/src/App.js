@@ -794,10 +794,16 @@ Jane Smith,+0987654321,XYZ Inc
                             </p>
                           </div>
                           
-                          {/* Individual Send Buttons - Popup Free Solution */}
-                          <div className="space-y-2">
-                            <h5 className="text-sm font-medium text-blue-900">Click to send individual messages:</h5>
-                            <div className="grid grid-cols-1 gap-2">
+                          {/* Copy Messages - Alternative to WhatsApp Web */}
+                          <div className="space-y-3">
+                            <div className="p-3 bg-orange-100 rounded border border-orange-200">
+                              <h5 className="text-sm font-medium text-orange-900">⚠️ WhatsApp Web Access Issue Detected</h5>
+                              <p className="text-xs text-orange-800 mt-1">
+                                Since WhatsApp Web seems blocked, here are your personalized messages to copy and send manually:
+                              </p>
+                            </div>
+                            
+                            <div className="space-y-2">
                               {(() => {
                                 // Get unique messages to avoid duplicates
                                 const uniqueMessages = messageLogs.filter(log => log.status === 'ready_for_batch_send')
@@ -811,36 +817,42 @@ Jane Smith,+0987654321,XYZ Inc
                                 return uniqueMessages.map((log, index) => {
                                   const contactName = contacts.find(c => c.phone === log.phone)?.name || `Contact ${index + 1}`;
                                   return (
-                                    <Button
-                                      key={log.phone}
-                                      onClick={() => {
-                                        // Direct user click - no popup blocker issues
-                                        window.open(log.error_message, '_blank');
-                                      }}
-                                      className="bg-green-600 hover:bg-green-700 text-white justify-between"
-                                      size="sm"
-                                    >
-                                      <span>📱 Send to {contactName}</span>
-                                      <span className="text-xs opacity-80">{log.phone}</span>
-                                    </Button>
+                                    <div key={log.phone} className="bg-white border border-gray-200 rounded-lg p-3">
+                                      <div className="flex items-center justify-between mb-2">
+                                        <h6 className="font-medium text-gray-900">{contactName}</h6>
+                                        <div className="flex items-center gap-2">
+                                          <span className="text-xs text-gray-500">{log.phone}</span>
+                                          <Button
+                                            onClick={() => {
+                                              navigator.clipboard.writeText(log.message);
+                                              alert(`✅ Message copied for ${contactName}!\n\nNow open WhatsApp on your phone and paste this message.`);
+                                            }}
+                                            size="sm"
+                                            className="bg-blue-600 hover:bg-blue-700 text-white"
+                                          >
+                                            📋 Copy Message
+                                          </Button>
+                                        </div>
+                                      </div>
+                                      <div className="bg-gray-50 p-2 rounded text-sm font-mono whitespace-pre-wrap">
+                                        {log.message}
+                                      </div>
+                                    </div>
                                   );
                                 });
                               })()}
                             </div>
                           </div>
                           
-                          {/* Quick Send All Instructions */}
+                          {/* Alternative Methods */}
                           <div className="p-3 bg-green-50 rounded border border-green-200">
-                            <h5 className="text-sm font-medium text-green-900 mb-1">🚀 Quick Bulk Send Instructions:</h5>
-                            <ol className="text-xs text-green-800 space-y-1">
-                              <li><strong>1.</strong> Right-click on each "Send to [Name]" button above</li>
-                              <li><strong>2.</strong> Select "Open link in new tab" from the menu</li>
-                              <li><strong>3.</strong> All WhatsApp tabs will open without popup blocking</li>
-                              <li><strong>4.</strong> Go through each tab and click "Send"</li>
+                            <h5 className="text-sm font-medium text-green-900">📱 Alternative Sending Methods:</h5>
+                            <ol className="text-xs text-green-800 space-y-1 mt-2">
+                              <li><strong>Method 1:</strong> Click "📋 Copy Message" → Open WhatsApp on your phone → Find contact → Paste & Send</li>
+                              <li><strong>Method 2:</strong> Use WhatsApp Desktop App (if installed) instead of web version</li>
+                              <li><strong>Method 3:</strong> Try accessing WhatsApp Web from a different network or VPN</li>
+                              <li><strong>Method 4:</strong> Forward messages from WhatsApp mobile app to multiple contacts</li>
                             </ol>
-                            <div className="text-xs text-green-600 mt-2">
-                              💡 Or use Ctrl+Click (Windows) / Cmd+Click (Mac) on each button to open tabs quickly
-                            </div>
                           </div>
                         </div>
                       </div>
