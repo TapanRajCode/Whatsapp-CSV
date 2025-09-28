@@ -78,7 +78,36 @@ const WhatsAppMessenger = () => {
     }, 0);
   };
 
-  const insertEmoji = (emoji) => {
+  const renderWhatsAppFormatting = (text) => {
+    if (!text) return '';
+    
+    // Replace WhatsApp formatting with HTML
+    let formattedText = text
+      // Bold: *text* -> <strong>text</strong>
+      .replace(/\*([^*]+)\*/g, '<strong>$1</strong>')
+      // Italic: _text_ -> <em>text</em>  
+      .replace(/_([^_]+)_/g, '<em>$1</em>')
+      // Strikethrough: ~text~ -> <s>text</s>
+      .replace(/~([^~]+)~/g, '<s>$1</s>')
+      // Monospace: ```text``` -> <code>text</code>
+      .replace(/```([^`]+)```/g, '<code style="background: #f1f1f1; padding: 2px 4px; border-radius: 3px; font-family: monospace;">$1</code>')
+      // Line breaks
+      .replace(/\n/g, '<br />');
+    
+    return formattedText;
+  };
+
+  const getPreviewMessage = () => {
+    if (!messageTemplate) return '';
+    
+    // Replace {name} with example name for preview
+    let preview = messageTemplate.replace(/{name}/g, '<span style="background: #e3f2fd; padding: 2px 4px; border-radius: 3px; color: #1565c0; font-weight: 500;">[Contact Name]</span>');
+    
+    // Replace other placeholders
+    preview = preview.replace(/{(\w+)}/g, '<span style="background: #f3e5f5; padding: 2px 4px; border-radius: 3px; color: #7b1fa2; font-weight: 500;">[$1]</span>');
+    
+    return renderWhatsAppFormatting(preview);
+  };
     const textarea = document.querySelector('textarea[placeholder*="Hi {name}"]');
     if (!textarea) return;
 
