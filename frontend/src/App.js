@@ -891,22 +891,6 @@ Jane Smith,+0987654321,XYZ Inc
                   <CardDescription>History of sent and failed messages</CardDescription>
                 </div>
                 <div className="flex gap-2">
-                  {messageLogs.some(log => log.status === 'ready_for_batch_send') && (
-                    <Button 
-                      onClick={() => {
-                        const readyMessages = messageLogs.filter(log => log.status === 'ready_for_batch_send' && log.error_message);
-                        readyMessages.forEach((log, index) => {
-                          setTimeout(() => {
-                            window.open(log.error_message, '_blank');
-                          }, index * 1000); // 1 second delay between each
-                        });
-                      }}
-                      className="bg-green-600 hover:bg-green-700 text-white"
-                      size="sm"
-                    >
-                      🚀 Send All ({messageLogs.filter(log => log.status === 'ready_for_batch_send').length})
-                    </Button>
-                  )}
                   {messageLogs.length > 0 && (
                     <Button 
                       variant="outline" 
