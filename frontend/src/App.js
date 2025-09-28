@@ -776,65 +776,72 @@ Jane Smith,+0987654321,XYZ Inc
                     {/* Send All Button - Only show if messages are ready */}
                     {messageLogs.some(log => log.status === 'ready_for_batch_send') && (
                       <div className="p-4 bg-blue-50 rounded-lg border-l-4 border-l-blue-500">
-                        <div className="flex items-center justify-between">
+                        <div className="space-y-4">
                           <div>
                             <h4 className="font-medium text-blue-900">📱 Messages Ready to Send</h4>
                             <p className="text-sm text-blue-700 mt-1">
-                              {messageLogs.filter(log => log.status === 'ready_for_batch_send').length} personalized messages are prepared and ready
+                              {(() => {
+                                // Get unique contacts to avoid duplicates
+                                const uniqueMessages = messageLogs.filter(log => log.status === 'ready_for_batch_send')
+                                  .reduce((acc, log) => {
+                                    if (!acc.find(item => item.phone === log.phone)) {
+                                      acc.push(log);
+                                    }
+                                    return acc;
+                                  }, []);
+                                return uniqueMessages.length;
+                              })()} personalized messages are prepared and ready
                             </p>
                           </div>
+                          
+                          {/* Individual Send Buttons - Popup Free Solution */}
                           <div className="space-y-2">
-                            <Button
-                              onClick={() => {
-                                const readyMessages = messageLogs.filter(log => log.status === 'ready_for_batch_send' && log.error_message);
-                                if (readyMessages.length === 0) return;
-                                
-                                // Open first message immediately
-                                window.open(readyMessages[0].error_message, '_blank');
-                                
-                                // Show instructions for popup blocker
-                                setTimeout(() => {
-                                  const remainingCount = readyMessages.length - 1;
-                                  if (remainingCount > 0) {
-                                    const proceed = confirm(`✅ First WhatsApp tab opened!\n\n⚠️ If other tabs were blocked by your browser:\n\n1. Allow popups for this site\n2. Or click "Send Remaining ${remainingCount}" button below\n\nClick OK to continue with remaining messages.`);
-                                    
-                                    if (proceed) {
-                                      // Open remaining messages one by one with delays
-                                      readyMessages.slice(1).forEach((log, index) => {
-                                        setTimeout(() => {
-                                          window.open(log.error_message, '_blank');
-                                        }, (index + 1) * 2000); // 2 second delay between each
-                                      });
+                            <h5 className="text-sm font-medium text-blue-900">Click to send individual messages:</h5>
+                            <div className="grid grid-cols-1 gap-2">
+                              {(() => {
+                                // Get unique messages to avoid duplicates
+                                const uniqueMessages = messageLogs.filter(log => log.status === 'ready_for_batch_send')
+                                  .reduce((acc, log) => {
+                                    if (!acc.find(item => item.phone === log.phone)) {
+                                      acc.push(log);
                                     }
-                                  }
-                                }, 1000);
-                              }}
-                              className="bg-blue-600 hover:bg-blue-700 text-white"
-                              size="lg"
-                            >
-                              🚀 Send All ({messageLogs.filter(log => log.status === 'ready_for_batch_send').length})
-                            </Button>
-                            
-                            <div className="grid grid-cols-1 gap-1">
-                              {messageLogs.filter(log => log.status === 'ready_for_batch_send').map((log, index) => {
-                                const contactName = contacts.find(c => c.phone === log.phone)?.name || 'Contact';
-                                return (
-                                  <Button
-                                    key={log.id}
-                                    onClick={() => window.open(log.error_message, '_blank')}
-                                    variant="outline"
-                                    size="sm"
-                                    className="text-xs justify-start"
-                                  >
-                                    📱 Send to {contactName}
-                                  </Button>
-                                );
-                              })}
+                                    return acc;
+                                  }, []);
+                                  
+                                return uniqueMessages.map((log, index) => {
+                                  const contactName = contacts.find(c => c.phone === log.phone)?.name || `Contact ${index + 1}`;
+                                  return (
+                                    <Button
+                                      key={log.phone}
+                                      onClick={() => {
+                                        // Direct user click - no popup blocker issues
+                                        window.open(log.error_message, '_blank');
+                                      }}
+                                      className="bg-green-600 hover:bg-green-700 text-white justify-between"
+                                      size="sm"
+                                    >
+                                      <span>📱 Send to {contactName}</span>
+                                      <span className="text-xs opacity-80">{log.phone}</span>
+                                    </Button>
+                                  );
+                                });
+                              })()}
                             </div>
                           </div>
-                        </div>
-                        <div className="mt-3 text-xs text-blue-600">
-                          💡 If popups are blocked, use individual "Send to [Name]" buttons below or allow popups for this site
+                          
+                          {/* Quick Send All Instructions */}
+                          <div className="p-3 bg-green-50 rounded border border-green-200">
+                            <h5 className="text-sm font-medium text-green-900 mb-1">🚀 Quick Bulk Send Instructions:</h5>
+                            <ol className="text-xs text-green-800 space-y-1">
+                              <li><strong>1.</strong> Right-click on each "Send to [Name]" button above</li>
+                              <li><strong>2.</strong> Select "Open link in new tab" from the menu</li>
+                              <li><strong>3.</strong> All WhatsApp tabs will open without popup blocking</li>
+                              <li><strong>4.</strong> Go through each tab and click "Send"</li>
+                            </ol>
+                            <div className="text-xs text-green-600 mt-2">
+                              💡 Or use Ctrl+Click (Windows) / Cmd+Click (Mac) on each button to open tabs quickly
+                            </div>
+                          </div>
                         </div>
                       </div>
                     )}
