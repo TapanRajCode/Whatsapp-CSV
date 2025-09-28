@@ -1514,16 +1514,17 @@ document.body.appendChild(control);
 document.getElementById('enhanced-start').onclick = () => enhancedSender.startSending();
 document.getElementById('enhanced-stop').onclick = () => enhancedSender.stop();
 
-console.log('🚀 ULTRA-ENHANCED SENDER 2025 READY!');
-console.log('NEW Features:');
-console.log('• Perfect pointer/mouse event sequences (focus→pointerdown→mousedown→pointerup→mouseup→click)');
-console.log('• Advanced AI-like send button detection');
-console.log('• Send button activity monitoring');
-console.log('• Enhanced position and context analysis');  
-console.log('• Modern browser compatibility (PointerEvents)');
-console.log('• Multiple fallback strategies');
+console.log('💥 NUCLEAR SENDER 2025 READY!');
+console.log('🚨 NUCLEAR Features:');
+console.log('• Green button hunting (targets exact WhatsApp green send button)');
+console.log('• SVG arrow detection and clicking');
+console.log('• Position-based targeting (bottom-right area)');
+console.log('• Brute force clicking on compose area elements');
+console.log('• Multiple keyboard simulation variations');
+console.log('• Nuclear click sequences (removes overlays, multiple event types)');
+console.log('• Touch event simulation for mobile compatibility');
 console.log('');
-console.log('Click "⚡ START ULTRA SEND" or run: enhancedSender.startSending()')`;
+console.log('Click "💥 START NUCLEAR SEND" or run: enhancedSender.startSending()')`;
 
                               // Fallback clipboard function
                               const fallbackCopyToClipboard = (text) => {
