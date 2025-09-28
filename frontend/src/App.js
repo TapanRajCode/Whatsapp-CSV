@@ -466,7 +466,99 @@ Jane Smith,+0987654321,XYZ Inc
               <CardContent>
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="message-template">Message Template</Label>
+                    <div className="flex items-center justify-between mb-2">
+                      <Label htmlFor="message-template">Message Template</Label>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setShowFormatting(!showFormatting)}
+                          className="text-xs"
+                        >
+                          📝 Formatting
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                          className="text-xs"
+                        >
+                          😊 Emojis
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    {/* WhatsApp Formatting Toolbar */}
+                    {showFormatting && (
+                      <div className="mb-3 p-3 bg-gray-50 rounded-lg border">
+                        <div className="text-sm text-gray-600 mb-2">WhatsApp Text Formatting:</div>
+                        <div className="flex flex-wrap gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => insertFormatting('bold')}
+                            className="text-xs"
+                          >
+                            <strong>B</strong> Bold
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => insertFormatting('italic')}
+                            className="text-xs"
+                          >
+                            <em>I</em> Italic
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => insertFormatting('strikethrough')}
+                            className="text-xs"
+                          >
+                            <s>S</s> Strike
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => insertFormatting('monospace')}
+                            className="text-xs font-mono"
+                          >
+                            M Mono
+                          </Button>
+                        </div>
+                        <div className="text-xs text-gray-500 mt-2">
+                          Select text first, then click formatting button. Or click to insert template.
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Emoji Picker */}
+                    {showEmojiPicker && (
+                      <div className="mb-3 p-3 bg-gray-50 rounded-lg border">
+                        <div className="text-sm text-gray-600 mb-2">Click to insert emoji:</div>
+                        <div className="grid grid-cols-8 gap-1">
+                          {commonEmojis.map((emoji, index) => (
+                            <Button
+                              key={index}
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => insertEmoji(emoji)}
+                              className="text-lg hover:bg-gray-200 p-1 h-8 w-8"
+                            >
+                              {emoji}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
                     <Textarea
                       id="message-template"
                       placeholder="Hi {name}! 👋\n\nI hope this message finds you well. I wanted to reach out about our upcoming event...\n\nBest regards!"
