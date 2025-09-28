@@ -781,7 +781,7 @@ Jane Smith,+0987654321,XYZ Inc
                           <p className="text-sm text-gray-600">Latest selectors + human simulation + anti-bot bypass</p>
                         </div>
                         <Button
-                          onClick={() => {
+                          onClick={async () => {
                             try {
                               const cleanContacts = contacts.map(contact => ({
                                 name: contact.name,
