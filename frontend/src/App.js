@@ -778,7 +778,7 @@ Jane Smith,+0987654321,XYZ Inc
                       <div className="flex items-center justify-between p-3 bg-white rounded border">
                         <div>
                           <h5 className="font-medium">Option 1: Ultra-Enhanced Auto-Send 2025</h5>
-                          <p className="text-sm text-gray-600">Perfect event sequences + AI detection + pointer events</p>
+                          <p className="text-sm text-gray-600">Green button hunting • SVG detection • Nuclear click sequences</p>
                         </div>
                         <Button
                           onClick={async () => {
