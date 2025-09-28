@@ -674,7 +674,7 @@ Jane Smith,+0987654321,XYZ Inc
               <CardFooter>
                 <Button 
                   onClick={sendBulkMessages}
-                  disabled={contacts.length === 0 || !messageTemplate.trim() || sendingProgress.active}
+                  disabled={!(whatsappStatus.authenticated || whatsappManualOverride) || contacts.length === 0 || !messageTemplate.trim() || sendingProgress.active}
                   className="bg-emerald-600 hover:bg-emerald-700"
                   size="lg"
                 >
