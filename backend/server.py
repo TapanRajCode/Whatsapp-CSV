@@ -383,5 +383,5 @@ async def shutdown_db_client():
 # Initialize WhatsApp on startup
 @app.on_event("startup")
 async def startup_event():
-    # Initialize WhatsApp driver
-    init_whatsapp_driver()
+    # Don't initialize WhatsApp automatically - let users do it manually
+    logging.info("WhatsApp CSV Messenger API started")
