@@ -793,7 +793,7 @@ Jane Smith,+0987654321,XYZ Inc
                               
                               const script = `
 console.clear();
-console.log('🚀 WhatsApp Bulk Sender Loading...');
+console.log('🚀 WhatsApp Bulk Sender v2.0 Loading...');
 
 // Contact data
 const contacts = ${JSON.stringify(cleanContacts, null, 2)};
@@ -802,7 +802,7 @@ const messageTemplate = \`${messageTemplate}\`;
 console.log('📋 Loaded', contacts.length, 'contacts');
 console.log('📝 Message template ready');
 
-// Bulk Sender Class
+// Enhanced Bulk Sender Class
 class WhatsAppBulkSender {
   constructor() {
     this.currentIndex = 0;
@@ -830,56 +830,188 @@ class WhatsAppBulkSender {
     return message;
   }
 
+  async waitForElement(selectors, timeout = 15000) {
+    const startTime = Date.now();
+    
+    while (Date.now() - startTime < timeout) {
+      for (const selector of selectors) {
+        const element = document.querySelector(selector);
+        if (element && element.offsetParent !== null && !element.disabled) {
+          return element;
+        }
+      }
+      await this.sleep(500);
+    }
+    return null;
+  }
+
+  async findAndClickSendButton() {
+    console.log('🔍 Looking for send button...');
+    
+    // Multiple attempts with different selectors and strategies
+    const strategies = [
+      // Strategy 1: Standard send button selectors
+      {
+        name: 'Standard Send Button',
+        selectors: [
+          '[data-testid="send"]',
+          'span[data-testid="send"]',
+          'button[data-testid="send"]',
+          '[data-icon="send"]',
+          '[aria-label="Send"]',
+          'button[aria-label="Send"]'
+        ]
+      },
+      // Strategy 2: Parent elements of send icons
+      {
+        name: 'Send Button Parents',
+        selectors: [
+          '[data-testid="send"] parent::button',
+          '[data-icon="send"] parent::button',
+          'span[data-testid="send"]',
+          'button:has([data-testid="send"])',
+          'div[role="button"]:has([data-testid="send"])'
+        ]
+      },
+      // Strategy 3: By text content and position
+      {
+        name: 'By Position',
+        selectors: [
+          'div[contenteditable="true"] + div button',
+          'footer button[aria-label]',
+          'footer [data-testid="send"]'
+        ]
+      }
+    ];
+
+    // Try each strategy
+    for (const strategy of strategies) {
+      console.log(\`Trying strategy: \${strategy.name}\`);
+      
+      for (const selector of strategy.selectors) {
+        try {
+          const elements = document.querySelectorAll(selector);
+          
+          for (const element of elements) {
+            if (element && element.offsetParent !== null && !element.disabled) {
+              console.log(\`Found element with selector: \${selector}\`);
+              
+              // Try clicking
+              element.click();
+              await this.sleep(500);
+              
+              // Check if message was sent (input should be empty)
+              const messageInput = document.querySelector('[contenteditable="true"][data-tab="10"]');
+              if (messageInput && (!messageInput.textContent || messageInput.textContent.trim() === '')) {
+                console.log('✅ Message sent successfully!');
+                return true;
+              }
+            }
+          }
+        } catch (error) {
+          console.log(\`Error with selector \${selector}:\`, error);
+        }
+      }
+    }
+
+    // Strategy 4: Keyboard shortcut fallback
+    console.log('📨 Trying keyboard shortcut (Enter key)...');
+    try {
+      const messageInput = document.querySelector('[contenteditable="true"][data-tab="10"]');
+      if (messageInput) {
+        messageInput.focus();
+        
+        // Send Enter key
+        const enterEvent = new KeyboardEvent('keydown', {
+          key: 'Enter',
+          code: 'Enter',
+          keyCode: 13,
+          which: 13,
+          bubbles: true
+        });
+        
+        messageInput.dispatchEvent(enterEvent);
+        await this.sleep(1000);
+        
+        // Check if message was sent
+        if (!messageInput.textContent || messageInput.textContent.trim() === '') {
+          console.log('✅ Message sent via Enter key!');
+          return true;
+        }
+      }
+    } catch (error) {
+      console.log('Error with Enter key:', error);
+    }
+
+    // Strategy 5: Advanced DOM search
+    console.log('🔬 Advanced DOM search...');
+    try {
+      // Look for any clickable element in the send area
+      const footerButtons = document.querySelectorAll('footer button, footer div[role="button"]');
+      
+      for (const button of footerButtons) {
+        const buttonText = button.textContent || '';
+        const hasIcon = button.querySelector('[data-icon="send"], [data-testid="send"]');
+        
+        if (hasIcon || buttonText.toLowerCase().includes('send')) {
+          console.log('Found potential send button via advanced search');
+          button.click();
+          await this.sleep(1000);
+          
+          const messageInput = document.querySelector('[contenteditable="true"][data-tab="10"]');
+          if (messageInput && (!messageInput.textContent || messageInput.textContent.trim() === '')) {
+            console.log('✅ Message sent via advanced search!');
+            return true;
+          }
+        }
+      }
+    } catch (error) {
+      console.log('Error in advanced search:', error);
+    }
+
+    console.log('❌ Could not find or click send button');
+    return false;
+  }
+
   async sendToContact(contact) {
     const phone = this.formatPhone(contact.phone);
     const message = this.personalizeMessage(messageTemplate, contact);
     
-    console.log(\`📱 Sending to \${contact.name} (\${contact.phone})\`);
+    console.log(\`\\n📱 Sending to \${contact.name} (\${contact.phone})\`);
+    console.log(\`Message: \${message.substring(0, 50)}...\`);
     
     try {
       // Navigate to WhatsApp send URL
       const url = \`https://web.whatsapp.com/send?phone=91\${phone}&text=\${encodeURIComponent(message)}\`;
+      console.log('🔗 Navigating to:', url);
+      
       window.location.href = url;
       
-      // Wait for page to load and send button to appear
-      await this.sleep(4000);
+      // Wait for page to load
+      console.log('⏳ Waiting for page to load...');
+      await this.sleep(5000);
       
-      // Try to find and click send button
-      const sendButton = this.findSendButton();
+      // Wait for message to be loaded in the input
+      console.log('⏳ Waiting for message to load...');
+      await this.sleep(2000);
       
-      if (sendButton) {
-        sendButton.click();
-        console.log(\`✅ Message sent to \${contact.name}\`);
+      // Try to send the message
+      const sendSuccess = await this.findAndClickSendButton();
+      
+      if (sendSuccess) {
+        console.log(\`✅ SUCCESS: Message sent to \${contact.name}\`);
         this.successCount++;
         return true;
       } else {
-        console.log(\`❌ Could not find send button for \${contact.name}\`);
+        console.log(\`❌ FAILED: Could not send to \${contact.name}\`);
         this.failCount++;
         return false;
       }
     } catch (error) {
-      console.error(\`❌ Error sending to \${contact.name}:\`, error);
+      console.error(\`❌ ERROR sending to \${contact.name}:\`, error);
       this.failCount++;
       return false;
     }
-  }
-
-  findSendButton() {
-    const selectors = [
-      '[data-testid="send"]',
-      '[data-icon="send"]',
-      '[aria-label="Send"]',
-      'button[data-testid="compose-btn-send"]',
-      'span[data-testid="send"]'
-    ];
-    
-    for (const selector of selectors) {
-      const element = document.querySelector(selector);
-      if (element && element.offsetParent !== null) {
-        return element;
-      }
-    }
-    return null;
   }
 
   sleep(ms) {
@@ -896,43 +1028,68 @@ class WhatsAppBulkSender {
     this.successCount = 0;
     this.failCount = 0;
     
-    console.log(\`🚀 Starting bulk send for \${contacts.length} contacts...\`);
+    console.log(\`\\n🚀 Starting enhanced bulk send for \${contacts.length} contacts...\`);
+    console.log('Features: Auto-send, Multiple strategies, Keyboard fallback');
     
     for (let i = 0; i < contacts.length; i++) {
-      if (!this.isRunning) break;
+      if (!this.isRunning) {
+        console.log('⏹️ Bulk send stopped by user');
+        break;
+      }
       
-      console.log(\`\\n📤 Sending message \${i + 1}/\${contacts.length}\`);
+      console.log(\`\\n📤 Processing contact \${i + 1}/\${contacts.length}\`);
+      console.log('=' .repeat(50));
       
-      await this.sendToContact(contacts[i]);
+      const success = await this.sendToContact(contacts[i]);
+      
+      // Show progress
+      console.log(\`\\n📊 Progress: \${i + 1}/\${contacts.length} processed\`);
+      console.log(\`✅ Successful: \${this.successCount}\`);
+      console.log(\`❌ Failed: \${this.failCount}\`);
       
       // Wait between messages (except for last one)
       if (i < contacts.length - 1) {
-        console.log('⏳ Waiting 6 seconds before next message...');
-        await this.sleep(6000);
+        console.log('⏳ Waiting 8 seconds before next message...');
+        await this.sleep(8000);
       }
     }
     
-    console.log(\`\\n🎉 Bulk send completed!\`);
-    console.log(\`✅ Successful: \${this.successCount}\`);
-    console.log(\`❌ Failed: \${this.failCount}\`);
+    console.log('\\n🎉 BULK SEND COMPLETED!');
+    console.log('=' .repeat(50));
+    console.log(\`✅ Successfully sent: \${this.successCount}/\${contacts.length}\`);
+    console.log(\`❌ Failed to send: \${this.failCount}/\${contacts.length}\`);
+    console.log(\`📈 Success rate: \${Math.round((this.successCount / contacts.length) * 100)}%\`);
     
     this.isRunning = false;
   }
 
   stop() {
     this.isRunning = false;
-    console.log('⏹️ Bulk send stopped');
+    console.log('⏹️ Bulk send stopped by user');
+  }
+
+  getStatus() {
+    return {
+      isRunning: this.isRunning,
+      currentIndex: this.currentIndex,
+      successCount: this.successCount,
+      failCount: this.failCount,
+      total: contacts.length
+    };
   }
 }
 
-// Initialize
+// Initialize enhanced bulk sender
 window.bulkSender = new WhatsAppBulkSender();
 
-console.log('\\n🎯 Ready to send!');
-console.log('Run: bulkSender.startBulkSend()');
-console.log('Or click the START button below');
+console.log('\\n🎯 ENHANCED BULK SENDER READY!');
+console.log('🔧 Features: Auto-send, Smart detection, Multiple fallbacks');
+console.log('📞 Commands:');
+console.log('  - bulkSender.startBulkSend()  // Start sending');
+console.log('  - bulkSender.stop()           // Stop sending');
+console.log('  - bulkSender.getStatus()      // Check status');
 
-// Create control buttons
+// Create enhanced control panel
 if (!document.getElementById('bulk-send-controls')) {
   const controls = document.createElement('div');
   controls.id = 'bulk-send-controls';
@@ -942,35 +1099,48 @@ if (!document.getElementById('bulk-send-controls')) {
     right: 20px;
     z-index: 9999;
     background: white;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    border: 2px solid #25D366;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+    border: 3px solid #25D366;
+    min-width: 300px;
   \`;
   
   controls.innerHTML = \`
-    <div style="margin-bottom: 10px; font-weight: bold; color: #25D366;">
-      🚀 WhatsApp Bulk Sender
+    <div style="margin-bottom: 15px; font-weight: bold; color: #25D366; font-size: 16px; text-align: center;">
+      🚀 WhatsApp Bulk Sender v2.0
     </div>
-    <button id="start-bulk" style="
-      background: #25D366;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-right: 10px;
-      font-weight: bold;
-    ">START BULK SEND</button>
-    <button id="stop-bulk" style="
-      background: #dc3545;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-    ">STOP</button>
+    <div style="margin-bottom: 10px; font-size: 12px; color: #666; text-align: center;">
+      \${contacts.length} contacts loaded • Auto-send enabled
+    </div>
+    <div style="display: flex; gap: 10px; justify-content: center;">
+      <button id="start-bulk" style="
+        background: #25D366;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 14px;
+      ">START AUTO-SEND</button>
+      <button id="stop-bulk" style="
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 14px;
+      ">STOP</button>
+    </div>
+    <div id="status" style="
+      margin-top: 10px;
+      font-size: 11px;
+      color: #666;
+      text-align: center;
+    ">Ready to start automatic bulk sending</div>
   \`;
   
   document.body.appendChild(controls);
@@ -979,18 +1149,28 @@ if (!document.getElementById('bulk-send-controls')) {
   document.getElementById('start-bulk').onclick = () => {
     if (!window.bulkSender.isRunning) {
       window.bulkSender.startBulkSend();
+      document.getElementById('status').textContent = 'Sending messages automatically...';
     } else {
-      alert('Bulk send is already running!');
+      alert('Auto-send is already running!');
     }
   };
   
   document.getElementById('stop-bulk').onclick = () => {
     window.bulkSender.stop();
+    document.getElementById('status').textContent = 'Stopped by user';
   };
+  
+  // Update status every 2 seconds
+  setInterval(() => {
+    const status = window.bulkSender.getStatus();
+    if (status.isRunning) {
+      document.getElementById('status').textContent = \`Sending... ✅\${status.successCount} ❌\${status.failCount}\`;
+    }
+  }, 2000);
 }`;
                               
                               navigator.clipboard.writeText(script).then(() => {
-                                alert('✅ Automation script copied successfully!\n\n📋 Next steps:\n1. Go to WhatsApp Web tab\n2. Press F12 to open Console\n3. Paste the script and press Enter\n4. Click "START BULK SEND" button\n\nThe script will send messages automatically with 6-second delays between each message.');
+                                alert('✅ Enhanced automation script copied!\n\n🎯 NEW FEATURES:\n• Automatic send button clicking\n• Multiple detection strategies\n• Keyboard fallback (Enter key)\n• Enhanced error handling\n• Real-time progress tracking\n\n📋 Next steps:\n1. Go to WhatsApp Web tab\n2. Press F12 → Console\n3. Paste script → Press Enter\n4. Click "START AUTO-SEND"\n\n🚀 Messages will be sent automatically without manual intervention!');
                               }).catch(() => {
                                 // Fallback for browsers that don't support clipboard API
                                 const textArea = document.createElement('textarea');
@@ -999,7 +1179,7 @@ if (!document.getElementById('bulk-send-controls')) {
                                 textArea.select();
                                 document.execCommand('copy');
                                 document.body.removeChild(textArea);
-                                alert('✅ Script copied! Paste it in WhatsApp Web console (F12).');
+                                alert('✅ Enhanced script copied! Features auto-send without manual clicks.');
                               });
                               
                             } catch (error) {
@@ -1010,7 +1190,7 @@ if (!document.getElementById('bulk-send-controls')) {
                           className="bg-blue-600 hover:bg-blue-700"
                           size="sm"
                         >
-                          📋 Copy Automation Script
+                          📋 Copy Enhanced Auto-Send Script
                         </Button>
                       </div>
                       
