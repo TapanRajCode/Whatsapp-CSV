@@ -178,28 +178,23 @@ async def whatsapp_status():
     # For now, let's provide a more user-friendly approach
     # Instead of automatically initializing, we'll let users manually initialize
     
-    message = "Ready to connect. Click 'Connect WhatsApp' to open WhatsApp Web."
-    
     if not driver:
         return WhatsAppStatus(
             authenticated=False,
             qr_available=False,
-            message=message
+            message="Ready to connect. Click 'Connect WhatsApp' to open WhatsApp Web."
         )
     
     is_auth = check_whatsapp_auth()
-    qr_available = not is_auth and driver is not None
     
     if is_auth:
         message = "✅ WhatsApp is connected and ready to send messages!"
-    elif qr_available:
-        message = "📱 Please scan the QR code in WhatsApp Web to authenticate"
     else:
-        message = "Click 'Connect WhatsApp' to start the connection process"
+        message = "📱 Please scan the QR code in WhatsApp Web to authenticate"
     
     return WhatsAppStatus(
         authenticated=is_auth,
-        qr_available=qr_available,
+        qr_available=not is_auth and driver is not None,
         message=message
     )
 
