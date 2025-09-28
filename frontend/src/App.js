@@ -789,11 +789,9 @@ Jane Smith,+0987654321,XYZ Inc
                                 additional_fields: contact.additional_fields || {}
                               }));
                               
-                              const cleanTemplate = messageTemplate.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n').replace(/\r/g, '');
-                              
                               const script = `
 console.clear();
-console.log('🚀 WhatsApp Bulk Sender v2.0 Loading...');
+console.log('🚀 WhatsApp Bulk Sender v3.0 - ULTRA AGGRESSIVE');
 
 // Contact data
 const contacts = ${JSON.stringify(cleanContacts, null, 2)};
@@ -802,13 +800,14 @@ const messageTemplate = \`${messageTemplate}\`;
 console.log('📋 Loaded', contacts.length, 'contacts');
 console.log('📝 Message template ready');
 
-// Enhanced Bulk Sender Class
-class WhatsAppBulkSender {
+// Ultra Aggressive Bulk Sender
+class UltraWhatsAppSender {
   constructor() {
     this.currentIndex = 0;
     this.isRunning = false;
     this.successCount = 0;
     this.failCount = 0;
+    this.maxRetries = 5;
   }
 
   formatPhone(phone) {
@@ -830,146 +829,353 @@ class WhatsAppBulkSender {
     return message;
   }
 
-  async waitForElement(selectors, timeout = 15000) {
-    const startTime = Date.now();
-    
-    while (Date.now() - startTime < timeout) {
-      for (const selector of selectors) {
-        const element = document.querySelector(selector);
-        if (element && element.offsetParent !== null && !element.disabled) {
-          return element;
-        }
-      }
-      await this.sleep(500);
-    }
-    return null;
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  async findAndClickSendButton() {
-    console.log('🔍 Looking for send button...');
+  // Ultra aggressive send button finding and clicking
+  async findAndClickSendButtonUltra() {
+    console.log('🔍 ULTRA AGGRESSIVE: Searching for send button...');
     
-    // Multiple attempts with different selectors and strategies
-    const strategies = [
-      // Strategy 1: Standard send button selectors
-      {
-        name: 'Standard Send Button',
-        selectors: [
-          '[data-testid="send"]',
-          'span[data-testid="send"]',
-          'button[data-testid="send"]',
-          '[data-icon="send"]',
-          '[aria-label="Send"]',
-          'button[aria-label="Send"]'
-        ]
+    // Wait for page to be fully loaded
+    await this.sleep(3000);
+    
+    // Strategy 1: Modern WhatsApp Web selectors (2024/2025)
+    const modernSelectors = [
+      'button[aria-label="Send"]',
+      'div[aria-label="Send"]',
+      'span[data-icon="send"]',
+      'button[data-testid="send"]',
+      'span[data-testid="send"]',
+      '[data-testid="compose-btn-send"]',
+      'button:has(span[data-icon="send"])',
+      'div:has(span[data-icon="send"])',
+      // New 2024 selectors
+      'button[title="Send"]',
+      'div[title="Send"]',
+      'button[data-tab="11"]',
+      'span[data-tab="11"]'
+    ];
+
+    // Try modern selectors first
+    for (const selector of modernSelectors) {
+      try {
+        console.log(\`Trying modern selector: \${selector}\`);
+        const elements = document.querySelectorAll(selector);
+        
+        for (const element of elements) {
+          if (this.isElementClickable(element)) {
+            console.log('Found clickable element with:', selector);
+            
+            if (await this.tryMultipleClickMethods(element)) {
+              return true;
+            }
+          }
+        }
+      } catch (error) {
+        console.log(\`Error with selector \${selector}:\`, error);
+      }
+    }
+
+    // Strategy 2: Search by position and context
+    console.log('🎯 Searching by position and context...');
+    
+    // Look for send buttons in footer area
+    const footerElements = document.querySelectorAll('footer *, div[contenteditable] ~ *, span[data-icon] *');
+    
+    for (const element of footerElements) {
+      const hasIconChild = element.querySelector('[data-icon="send"], [data-testid="send"]');
+      const isSendButton = element.getAttribute('aria-label') === 'Send' || 
+                          element.getAttribute('title') === 'Send' ||
+                          hasIconChild;
+      
+      if (isSendButton && this.isElementClickable(element)) {
+        console.log('Found send button by context');
+        if (await this.tryMultipleClickMethods(element)) {
+          return true;
+        }
+      }
+    }
+
+    // Strategy 3: Brute force - try all clickable elements in footer
+    console.log('💪 BRUTE FORCE: Trying all clickable elements...');
+    
+    const allClickable = document.querySelectorAll('button, div[role="button"], span[role="button"], [tabindex="0"]');
+    
+    for (const element of allClickable) {
+      if (this.isInFooterArea(element) && this.isElementClickable(element)) {
+        console.log('Trying brute force click on:', element.tagName, element.className);
+        
+        // Check if this might be a send button
+        const elementText = element.textContent || '';
+        const hasIcon = element.querySelector('[data-icon], [data-testid]');
+        
+        if (hasIcon || elementText.toLowerCase().includes('send') || this.isLikelySendButton(element)) {
+          if (await this.tryMultipleClickMethods(element)) {
+            return true;
+          }
+        }
+      }
+    }
+
+    // Strategy 4: Keyboard shortcuts (most reliable)
+    console.log('⌨️ Trying keyboard shortcuts...');
+    return await this.tryKeyboardSend();
+  }
+
+  isElementClickable(element) {
+    if (!element || !element.offsetParent) return false;
+    
+    const style = getComputedStyle(element);
+    return style.display !== 'none' && 
+           style.visibility !== 'hidden' && 
+           !element.disabled &&
+           style.pointerEvents !== 'none';
+  }
+
+  isInFooterArea(element) {
+    const rect = element.getBoundingClientRect();
+    const windowHeight = window.innerHeight;
+    
+    // Check if element is in bottom 30% of screen
+    return rect.top > windowHeight * 0.7;
+  }
+
+  isLikelySendButton(element) {
+    const rect = element.getBoundingClientRect();
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    
+    // Send buttons are usually in bottom-right area and small/medium sized
+    return rect.right > windowWidth * 0.8 && 
+           rect.bottom > windowHeight * 0.8 &&
+           rect.width < 100 && 
+           rect.height < 100;
+  }
+
+  async tryMultipleClickMethods(element) {
+    console.log('🎯 Trying multiple click methods...');
+    
+    const clickMethods = [
+      // Method 1: Standard click
+      () => {
+        console.log('Method 1: Standard click');
+        element.click();
       },
-      // Strategy 2: Parent elements of send icons
-      {
-        name: 'Send Button Parents',
-        selectors: [
-          '[data-testid="send"] parent::button',
-          '[data-icon="send"] parent::button',
-          'span[data-testid="send"]',
-          'button:has([data-testid="send"])',
-          'div[role="button"]:has([data-testid="send"])'
-        ]
+      
+      // Method 2: Mouse event
+      () => {
+        console.log('Method 2: Mouse event');
+        const mouseEvent = new MouseEvent('click', {
+          view: window,
+          bubbles: true,
+          cancelable: true,
+          buttons: 1
+        });
+        element.dispatchEvent(mouseEvent);
       },
-      // Strategy 3: By text content and position
-      {
-        name: 'By Position',
-        selectors: [
-          'div[contenteditable="true"] + div button',
-          'footer button[aria-label]',
-          'footer [data-testid="send"]'
-        ]
+      
+      // Method 3: Focus and space/enter
+      () => {
+        console.log('Method 3: Focus and Enter');
+        element.focus();
+        const enterEvent = new KeyboardEvent('keydown', {
+          key: 'Enter',
+          code: 'Enter',
+          keyCode: 13,
+          bubbles: true
+        });
+        element.dispatchEvent(enterEvent);
+      },
+      
+      // Method 4: Simulate touch (for mobile-responsive elements)
+      () => {
+        console.log('Method 4: Touch event');
+        const touchEvent = new TouchEvent('touchstart', {
+          bubbles: true,
+          cancelable: true,
+          touches: [{
+            clientX: element.getBoundingClientRect().left + 5,
+            clientY: element.getBoundingClientRect().top + 5
+          }]
+        });
+        element.dispatchEvent(touchEvent);
+        
+        setTimeout(() => {
+          const touchEndEvent = new TouchEvent('touchend', {
+            bubbles: true,
+            cancelable: true
+          });
+          element.dispatchEvent(touchEndEvent);
+        }, 50);
+      },
+
+      // Method 5: Force click using JavaScript
+      () => {
+        console.log('Method 5: JavaScript force click');
+        if (element.onclick) {
+          element.onclick();
+        } else if (element.click) {
+          element.click();
+        }
       }
     ];
 
-    // Try each strategy
-    for (const strategy of strategies) {
-      console.log(\`Trying strategy: \${strategy.name}\`);
-      
-      for (const selector of strategy.selectors) {
-        try {
-          const elements = document.querySelectorAll(selector);
-          
-          for (const element of elements) {
-            if (element && element.offsetParent !== null && !element.disabled) {
-              console.log(\`Found element with selector: \${selector}\`);
-              
-              // Try clicking
-              element.click();
-              await this.sleep(500);
-              
-              // Check if message was sent (input should be empty)
-              const messageInput = document.querySelector('[contenteditable="true"][data-tab="10"]');
-              if (messageInput && (!messageInput.textContent || messageInput.textContent.trim() === '')) {
-                console.log('✅ Message sent successfully!');
-                return true;
-              }
-            }
-          }
-        } catch (error) {
-          console.log(\`Error with selector \${selector}:\`, error);
+    // Try each click method
+    for (let i = 0; i < clickMethods.length; i++) {
+      try {
+        clickMethods[i]();
+        
+        // Wait and check if message was sent
+        await this.sleep(2000);
+        
+        if (await this.checkMessageSent()) {
+          console.log(\`✅ SUCCESS with method \${i + 1}!\`);
+          return true;
         }
+        
+      } catch (error) {
+        console.log(\`Method \${i + 1} failed:\`, error);
       }
     }
+    
+    return false;
+  }
 
-    // Strategy 4: Keyboard shortcut fallback
-    console.log('📨 Trying keyboard shortcut (Enter key)...');
-    try {
-      const messageInput = document.querySelector('[contenteditable="true"][data-tab="10"]');
+  async tryKeyboardSend() {
+    console.log('⌨️ Trying keyboard send methods...');
+    
+    // Find the message input
+    const inputSelectors = [
+      'div[contenteditable="true"][data-tab="10"]',
+      'div[contenteditable="true"]',
+      'div[role="textbox"]',
+      '[data-testid="conversation-compose-box-input"]'
+    ];
+    
+    let messageInput = null;
+    for (const selector of inputSelectors) {
+      messageInput = document.querySelector(selector);
       if (messageInput) {
+        console.log('Found message input with:', selector);
+        break;
+      }
+    }
+    
+    if (!messageInput) {
+      console.log('❌ Could not find message input');
+      return false;
+    }
+    
+    // Try keyboard methods
+    const keyboardMethods = [
+      // Method 1: Enter key
+      () => {
+        console.log('Keyboard Method 1: Enter key');
         messageInput.focus();
         
-        // Send Enter key
         const enterEvent = new KeyboardEvent('keydown', {
           key: 'Enter',
           code: 'Enter',
           keyCode: 13,
           which: 13,
-          bubbles: true
+          bubbles: true,
+          cancelable: true
         });
         
         messageInput.dispatchEvent(enterEvent);
-        await this.sleep(1000);
+      },
+      
+      // Method 2: Ctrl + Enter
+      () => {
+        console.log('Keyboard Method 2: Ctrl + Enter');
+        messageInput.focus();
         
-        // Check if message was sent
-        if (!messageInput.textContent || messageInput.textContent.trim() === '') {
-          console.log('✅ Message sent via Enter key!');
+        const ctrlEnterEvent = new KeyboardEvent('keydown', {
+          key: 'Enter',
+          code: 'Enter',
+          keyCode: 13,
+          which: 13,
+          ctrlKey: true,
+          bubbles: true,
+          cancelable: true
+        });
+        
+        messageInput.dispatchEvent(ctrlEnterEvent);
+      },
+      
+      // Method 3: Tab to send button then Enter
+      () => {
+        console.log('Keyboard Method 3: Tab + Enter');
+        messageInput.focus();
+        
+        // Tab to next element (should be send button)
+        const tabEvent = new KeyboardEvent('keydown', {
+          key: 'Tab',
+          code: 'Tab',
+          keyCode: 9,
+          which: 9,
+          bubbles: true
+        });
+        
+        messageInput.dispatchEvent(tabEvent);
+        
+        setTimeout(() => {
+          const enterEvent = new KeyboardEvent('keydown', {
+            key: 'Enter',
+            code: 'Enter',
+            keyCode: 13,
+            which: 13,
+            bubbles: true
+          });
+          
+          document.activeElement.dispatchEvent(enterEvent);
+        }, 500);
+      }
+    ];
+    
+    // Try each keyboard method
+    for (let i = 0; i < keyboardMethods.length; i++) {
+      try {
+        keyboardMethods[i]();
+        
+        // Wait and check if message was sent
+        await this.sleep(3000);
+        
+        if (await this.checkMessageSent()) {
+          console.log(\`✅ SUCCESS with keyboard method \${i + 1}!\`);
           return true;
         }
-      }
-    } catch (error) {
-      console.log('Error with Enter key:', error);
-    }
-
-    // Strategy 5: Advanced DOM search
-    console.log('🔬 Advanced DOM search...');
-    try {
-      // Look for any clickable element in the send area
-      const footerButtons = document.querySelectorAll('footer button, footer div[role="button"]');
-      
-      for (const button of footerButtons) {
-        const buttonText = button.textContent || '';
-        const hasIcon = button.querySelector('[data-icon="send"], [data-testid="send"]');
         
-        if (hasIcon || buttonText.toLowerCase().includes('send')) {
-          console.log('Found potential send button via advanced search');
-          button.click();
-          await this.sleep(1000);
-          
-          const messageInput = document.querySelector('[contenteditable="true"][data-tab="10"]');
-          if (messageInput && (!messageInput.textContent || messageInput.textContent.trim() === '')) {
-            console.log('✅ Message sent via advanced search!');
-            return true;
-          }
+      } catch (error) {
+        console.log(\`Keyboard method \${i + 1} failed:\`, error);
+      }
+    }
+    
+    return false;
+  }
+
+  async checkMessageSent() {
+    // Check if the message input is empty (indicates message was sent)
+    const inputSelectors = [
+      'div[contenteditable="true"][data-tab="10"]',
+      'div[contenteditable="true"]',
+      'div[role="textbox"]'
+    ];
+    
+    for (const selector of inputSelectors) {
+      const input = document.querySelector(selector);
+      if (input) {
+        const isEmpty = !input.textContent || input.textContent.trim() === '' || input.innerHTML === '<br>';
+        if (isEmpty) {
+          console.log('✅ Message input is empty - message appears to be sent!');
+          return true;
+        } else {
+          console.log('❌ Message input still has content:', input.textContent?.substring(0, 50));
         }
       }
-    } catch (error) {
-      console.log('Error in advanced search:', error);
     }
-
-    console.log('❌ Could not find or click send button');
+    
     return false;
   }
 
@@ -977,50 +1183,52 @@ class WhatsAppBulkSender {
     const phone = this.formatPhone(contact.phone);
     const message = this.personalizeMessage(messageTemplate, contact);
     
-    console.log(\`\\n📱 Sending to \${contact.name} (\${contact.phone})\`);
-    console.log(\`Message: \${message.substring(0, 50)}...\`);
+    console.log(\`\\n📱 ULTRA SEND to \${contact.name} (\${contact.phone})\`);
+    console.log(\`Message preview: \${message.substring(0, 100)}...\`);
     
     try {
       // Navigate to WhatsApp send URL
       const url = \`https://web.whatsapp.com/send?phone=91\${phone}&text=\${encodeURIComponent(message)}\`;
-      console.log('🔗 Navigating to:', url);
+      console.log('🔗 Navigating to WhatsApp...');
       
       window.location.href = url;
       
-      // Wait for page to load
-      console.log('⏳ Waiting for page to load...');
-      await this.sleep(5000);
+      // Wait for page load
+      console.log('⏳ Waiting for page to load completely...');
+      await this.sleep(7000); // Longer wait for better reliability
       
-      // Wait for message to be loaded in the input
-      console.log('⏳ Waiting for message to load...');
-      await this.sleep(2000);
+      console.log('🎯 Starting ultra-aggressive send attempt...');
       
-      // Try to send the message
-      const sendSuccess = await this.findAndClickSendButton();
-      
-      if (sendSuccess) {
-        console.log(\`✅ SUCCESS: Message sent to \${contact.name}\`);
-        this.successCount++;
-        return true;
-      } else {
-        console.log(\`❌ FAILED: Could not send to \${contact.name}\`);
-        this.failCount++;
-        return false;
+      // Try multiple times with different strategies
+      for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
+        console.log(\`\\n🔄 Attempt \${attempt}/\${this.maxRetries}\`);
+        
+        const success = await this.findAndClickSendButtonUltra();
+        
+        if (success) {
+          console.log(\`✅ ULTRA SUCCESS: Message sent to \${contact.name} on attempt \${attempt}\`);
+          this.successCount++;
+          return true;
+        } else {
+          console.log(\`❌ Attempt \${attempt} failed, waiting before retry...\`);
+          await this.sleep(2000);
+        }
       }
+      
+      console.log(\`❌ ULTRA FAILED: Could not send to \${contact.name} after \${this.maxRetries} attempts\`);
+      this.failCount++;
+      return false;
+      
     } catch (error) {
-      console.error(\`❌ ERROR sending to \${contact.name}:\`, error);
+      console.error(\`❌ ULTRA ERROR for \${contact.name}:\`, error);
       this.failCount++;
       return false;
     }
   }
 
-  sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
   async startBulkSend() {
     if (this.isRunning) {
-      console.log('⚠️ Bulk send already running!');
+      console.log('⚠️ Ultra bulk send already running!');
       return;
     }
 
@@ -1028,169 +1236,166 @@ class WhatsAppBulkSender {
     this.successCount = 0;
     this.failCount = 0;
     
-    console.log(\`\\n🚀 Starting enhanced bulk send for \${contacts.length} contacts...\`);
-    console.log('Features: Auto-send, Multiple strategies, Keyboard fallback');
+    console.log('\\n🚀 STARTING ULTRA AGGRESSIVE BULK SEND!');
+    console.log('💪 Features: 5 retry attempts, Multiple click methods, Keyboard fallbacks');
+    console.log(\`📊 Contacts to process: \${contacts.length}\`);
     
     for (let i = 0; i < contacts.length; i++) {
       if (!this.isRunning) {
-        console.log('⏹️ Bulk send stopped by user');
+        console.log('⏹️ Ultra bulk send stopped by user');
         break;
       }
       
-      console.log(\`\\n📤 Processing contact \${i + 1}/\${contacts.length}\`);
-      console.log('=' .repeat(50));
+      console.log('\\n' + '🔥'.repeat(60));
+      console.log(\`📤 PROCESSING CONTACT \${i + 1}/\${contacts.length}\`);
+      console.log('🔥'.repeat(60));
       
       const success = await this.sendToContact(contacts[i]);
       
       // Show progress
-      console.log(\`\\n📊 Progress: \${i + 1}/\${contacts.length} processed\`);
+      console.log('\\n📊 CURRENT STATS:');
       console.log(\`✅ Successful: \${this.successCount}\`);
       console.log(\`❌ Failed: \${this.failCount}\`);
+      console.log(\`📈 Success Rate: \${Math.round((this.successCount / (i + 1)) * 100)}%\`);
       
-      // Wait between messages (except for last one)
+      // Wait between messages
       if (i < contacts.length - 1) {
-        console.log('⏳ Waiting 8 seconds before next message...');
-        await this.sleep(8000);
+        console.log('\\n⏳ Waiting 10 seconds before next contact...');
+        await this.sleep(10000); // Longer delay for reliability
       }
     }
     
-    console.log('\\n🎉 BULK SEND COMPLETED!');
-    console.log('=' .repeat(50));
+    console.log('\\n🎉 ULTRA BULK SEND COMPLETED!');
+    console.log('🏆'.repeat(50));
     console.log(\`✅ Successfully sent: \${this.successCount}/\${contacts.length}\`);
     console.log(\`❌ Failed to send: \${this.failCount}/\${contacts.length}\`);
-    console.log(\`📈 Success rate: \${Math.round((this.successCount / contacts.length) * 100)}%\`);
+    console.log(\`📈 Final Success Rate: \${Math.round((this.successCount / contacts.length) * 100)}%\`);
     
     this.isRunning = false;
   }
 
   stop() {
     this.isRunning = false;
-    console.log('⏹️ Bulk send stopped by user');
-  }
-
-  getStatus() {
-    return {
-      isRunning: this.isRunning,
-      currentIndex: this.currentIndex,
-      successCount: this.successCount,
-      failCount: this.failCount,
-      total: contacts.length
-    };
+    console.log('⏹️ Ultra bulk send stopped by user');
   }
 }
 
-// Initialize enhanced bulk sender
-window.bulkSender = new WhatsAppBulkSender();
+// Initialize Ultra Sender
+window.ultraSender = new UltraWhatsAppSender();
 
-console.log('\\n🎯 ENHANCED BULK SENDER READY!');
-console.log('🔧 Features: Auto-send, Smart detection, Multiple fallbacks');
+console.log('\\n🎯 ULTRA WHATSAPP SENDER READY!');
+console.log('💪 ULTRA FEATURES: Multi-retry, All click methods, Keyboard fallbacks');
 console.log('📞 Commands:');
-console.log('  - bulkSender.startBulkSend()  // Start sending');
-console.log('  - bulkSender.stop()           // Stop sending');
-console.log('  - bulkSender.getStatus()      // Check status');
+console.log('  ultraSender.startBulkSend()  // Start ultra sending');
+console.log('  ultraSender.stop()           // Stop sending');
 
-// Create enhanced control panel
-if (!document.getElementById('bulk-send-controls')) {
+// Create ultra control panel
+if (!document.getElementById('ultra-send-controls')) {
   const controls = document.createElement('div');
-  controls.id = 'bulk-send-controls';
+  controls.id = 'ultra-send-controls';
   controls.style.cssText = \`
     position: fixed;
     top: 20px;
     right: 20px;
     z-index: 9999;
-    background: white;
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-    border: 3px solid #25D366;
-    min-width: 300px;
+    background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+    color: white;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(255, 107, 107, 0.4);
+    border: 3px solid #ffffff;
+    min-width: 350px;
+    font-family: Arial, sans-serif;
   \`;
   
   controls.innerHTML = \`
-    <div style="margin-bottom: 15px; font-weight: bold; color: #25D366; font-size: 16px; text-align: center;">
-      🚀 WhatsApp Bulk Sender v2.0
+    <div style="margin-bottom: 15px; font-weight: bold; font-size: 18px; text-align: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">
+      🔥 ULTRA WHATSAPP SENDER 🔥
     </div>
-    <div style="margin-bottom: 10px; font-size: 12px; color: #666; text-align: center;">
-      \${contacts.length} contacts loaded • Auto-send enabled
+    <div style="margin-bottom: 15px; font-size: 12px; text-align: center; opacity: 0.9;">
+      \${contacts.length} contacts • Multi-retry • Force-send enabled
     </div>
-    <div style="display: flex; gap: 10px; justify-content: center;">
-      <button id="start-bulk" style="
-        background: #25D366;
-        color: white;
+    <div style="display: flex; gap: 15px; justify-content: center;">
+      <button id="ultra-start" style="
+        background: #ffffff;
+        color: #ff6b6b;
         border: none;
-        padding: 12px 20px;
-        border-radius: 8px;
+        padding: 15px 25px;
+        border-radius: 10px;
         cursor: pointer;
         font-weight: bold;
         font-size: 14px;
-      ">START AUTO-SEND</button>
-      <button id="stop-bulk" style="
-        background: #dc3545;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        transition: all 0.3s ease;
+      ">🚀 START ULTRA SEND</button>
+      <button id="ultra-stop" style="
+        background: #2d3436;
         color: white;
         border: none;
-        padding: 12px 20px;
-        border-radius: 8px;
+        padding: 15px 25px;
+        border-radius: 10px;
         cursor: pointer;
         font-weight: bold;
         font-size: 14px;
-      ">STOP</button>
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      ">⏹️ STOP</button>
     </div>
-    <div id="status" style="
-      margin-top: 10px;
+    <div id="ultra-status" style="
+      margin-top: 15px;
       font-size: 11px;
-      color: #666;
       text-align: center;
-    ">Ready to start automatic bulk sending</div>
+      opacity: 0.9;
+    ">Ready for ultra-aggressive bulk sending</div>
   \`;
   
   document.body.appendChild(controls);
   
+  // Add hover effects
+  const startBtn = document.getElementById('ultra-start');
+  const stopBtn = document.getElementById('ultra-stop');
+  
+  startBtn.onmouseover = () => startBtn.style.transform = 'scale(1.05)';
+  startBtn.onmouseout = () => startBtn.style.transform = 'scale(1)';
+  stopBtn.onmouseover = () => stopBtn.style.transform = 'scale(1.05)';
+  stopBtn.onmouseout = () => stopBtn.style.transform = 'scale(1)';
+  
   // Add event listeners
-  document.getElementById('start-bulk').onclick = () => {
-    if (!window.bulkSender.isRunning) {
-      window.bulkSender.startBulkSend();
-      document.getElementById('status').textContent = 'Sending messages automatically...';
+  startBtn.onclick = () => {
+    if (!window.ultraSender.isRunning) {
+      window.ultraSender.startBulkSend();
+      document.getElementById('ultra-status').textContent = '🔥 Ultra sending in progress...';
     } else {
-      alert('Auto-send is already running!');
+      alert('🔥 Ultra send is already running!');
     }
   };
   
-  document.getElementById('stop-bulk').onclick = () => {
-    window.bulkSender.stop();
-    document.getElementById('status').textContent = 'Stopped by user';
+  stopBtn.onclick = () => {
+    window.ultraSender.stop();
+    document.getElementById('ultra-status').textContent = '⏹️ Stopped by user';
   };
-  
-  // Update status every 2 seconds
-  setInterval(() => {
-    const status = window.bulkSender.getStatus();
-    if (status.isRunning) {
-      document.getElementById('status').textContent = \`Sending... ✅\${status.successCount} ❌\${status.failCount}\`;
-    }
-  }, 2000);
 }`;
                               
                               navigator.clipboard.writeText(script).then(() => {
-                                alert('✅ Enhanced automation script copied!\n\n🎯 NEW FEATURES:\n• Automatic send button clicking\n• Multiple detection strategies\n• Keyboard fallback (Enter key)\n• Enhanced error handling\n• Real-time progress tracking\n\n📋 Next steps:\n1. Go to WhatsApp Web tab\n2. Press F12 → Console\n3. Paste script → Press Enter\n4. Click "START AUTO-SEND"\n\n🚀 Messages will be sent automatically without manual intervention!');
+                                alert('🔥 ULTRA AGGRESSIVE AUTO-SEND SCRIPT COPIED!\n\n💪 NEW ULTRA FEATURES:\n• 5 retry attempts per contact\n• Multiple click detection strategies\n• Modern WhatsApp Web selectors (2024/2025)\n• Keyboard shortcuts as fallback\n• Brute force element detection\n• Touch events for mobile elements\n• Extended wait times for reliability\n\n📋 INSTRUCTIONS:\n1. Open WhatsApp Web\n2. Press F12 → Console\n3. Paste script → Enter\n4. Click "🚀 START ULTRA SEND"\n\n🎯 This ultra-aggressive version tries EVERY possible method to click send!');
                               }).catch(() => {
-                                // Fallback for browsers that don't support clipboard API
                                 const textArea = document.createElement('textarea');
                                 textArea.value = script;
                                 document.body.appendChild(textArea);
                                 textArea.select();
                                 document.execCommand('copy');
                                 document.body.removeChild(textArea);
-                                alert('✅ Enhanced script copied! Features auto-send without manual clicks.');
+                                alert('🔥 ULTRA script copied! This version is much more aggressive in clicking send buttons.');
                               });
                               
                             } catch (error) {
-                              console.error('Error generating script:', error);
-                              alert('❌ Error generating automation script. Please check the console for details.');
+                              console.error('Error generating ultra script:', error);
+                              alert('❌ Error generating ultra script. Please check console.');
                             }
                           }}
-                          className="bg-blue-600 hover:bg-blue-700"
+                          className="bg-red-600 hover:bg-red-700 text-white font-bold"
                           size="sm"
                         >
-                          📋 Copy Enhanced Auto-Send Script
+                          🔥 Copy ULTRA Auto-Send Script
                         </Button>
                       </div>
                       
