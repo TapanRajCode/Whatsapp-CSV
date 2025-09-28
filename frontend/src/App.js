@@ -1287,9 +1287,62 @@ console.log('• Real-time progress tracking');
 console.log('');
 console.log('Click "▶️ START SENDING" or run: enhancedSender.startSending()')`;
 
-                              navigator.clipboard.writeText(script).then(() => {
+                              // Fallback clipboard function
+                              const fallbackCopyToClipboard = (text) => {
+                                const textArea = document.createElement('textarea');
+                                textArea.value = text;
+                                textArea.style.position = 'fixed';
+                                textArea.style.left = '-999999px';
+                                textArea.style.top = '-999999px';
+                                document.body.appendChild(textArea);
+                                textArea.focus();
+                                textArea.select();
+                                
+                                try {
+                                  document.execCommand('copy');
+                                  textArea.remove();
+                                  return true;
+                                } catch (err) {
+                                  textArea.remove();
+                                  return false;
+                                }
+                              };
+
+                              // Try modern clipboard API first, then fallback
+                              const copyToClipboard = async (text) => {
+                                if (navigator.clipboard && window.isSecureContext) {
+                                  try {
+                                    await navigator.clipboard.writeText(text);
+                                    return true;
+                                  } catch (err) {
+                                    console.warn('Modern clipboard failed, trying fallback:', err);
+                                    return fallbackCopyToClipboard(text);
+                                  }
+                                } else {
+                                  return fallbackCopyToClipboard(text);
+                                }
+                              };
+
+                              const success = await copyToClipboard(script);
+                              
+                              if (success) {
                                 alert('🚀 ENHANCED AUTO-SEND SCRIPT 2025 COPIED!\n\nNew Features:\n• Latest WhatsApp Web selectors (data-testid)\n• Human-like typing & mouse simulation\n• Anti-bot detection bypass\n• Multiple send strategies with fallbacks\n• Real-time progress tracking\n• Smart retry mechanisms\n\nInstructions:\n1. Open WhatsApp Web & login\n2. F12 → Console tab\n3. Paste script → Press Enter\n4. Click "▶️ START SENDING"\n\nThis version has significantly higher success rates!');
-                              });
+                              } else {
+                                // Show the script in a popup if copy fails
+                                const popup = window.open('', 'script', 'width=800,height=600,scrollbars=yes');
+                                popup.document.write(`
+                                  <html>
+                                    <head><title>Enhanced Auto-Send Script 2025</title></head>
+                                    <body>
+                                      <h2>🚀 Enhanced Auto-Send Script 2025</h2>
+                                      <p><strong>Copy failed - please manually copy this script:</strong></p>
+                                      <textarea style="width:100%; height:400px; font-family:monospace;" readonly>${script}</textarea>
+                                      <br><br>
+                                      <button onclick="navigator.clipboard.writeText(document.querySelector('textarea').value).then(() => alert('Copied!')).catch(() => alert('Please manually select and copy'))">Try Copy Again</button>
+                                    </body>
+                                  </html>
+                                `);
+                              }
                             } catch (error) {
                               alert('Error generating script: ' + error.message);
                             }
