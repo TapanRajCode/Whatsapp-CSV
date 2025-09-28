@@ -1285,7 +1285,7 @@ console.log('• Multiple send strategies with fallbacks');
 console.log('• Anti-detection randomization');
 console.log('• Real-time progress tracking');
 console.log('');
-console.log('Click "▶️ START SENDING" or run: enhancedSender.startSending()');`;`;
+console.log('Click "▶️ START SENDING" or run: enhancedSender.startSending()')`;
 
                               navigator.clipboard.writeText(script).then(() => {
                                 alert('🚀 ENHANCED AUTO-SEND SCRIPT 2025 COPIED!\n\nNew Features:\n• Latest WhatsApp Web selectors (data-testid)\n• Human-like typing & mouse simulation\n• Anti-bot detection bypass\n• Multiple send strategies with fallbacks\n• Real-time progress tracking\n• Smart retry mechanisms\n\nInstructions:\n1. Open WhatsApp Web & login\n2. F12 → Console tab\n3. Paste script → Press Enter\n4. Click "▶️ START SENDING"\n\nThis version has significantly higher success rates!');
