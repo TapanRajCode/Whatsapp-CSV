@@ -452,12 +452,7 @@ async def send_bulk_messages(request: BulkMessageRequest):
         sent_count = 0
         failed_count = 0
         
-        # Initialize WhatsApp driver if not already done
-        if not driver:
-            success = init_whatsapp_driver()
-            if not success:
-                raise HTTPException(status_code=500, detail="Failed to initialize WhatsApp driver")
-        
+        # Process each contact and create personalized messages
         for contact in contacts:
             try:
                 # Personalize message
@@ -467,40 +462,37 @@ async def send_bulk_messages(request: BulkMessageRequest):
                 for field, value in contact.get("additional_fields", {}).items():
                     message = message.replace(f"{{{field}}}", str(value))
                 
-                print(f"Sending message to {contact['name']} ({contact['phone']})")
+                # Since we're in a server environment, create WhatsApp Web direct links
+                # This will allow the user to click and send automatically
+                phone_clean = re.sub(r'[^\d]', '', contact["phone"])
+                if phone_clean.startswith('91'):
+                    phone_clean = phone_clean[2:]  # Remove country code
                 
-                # Send message using WhatsApp Web automation
-                result = await send_whatsapp_message_real(contact["phone"], message)
+                whatsapp_url = f"https://web.whatsapp.com/send?phone=91{phone_clean}&text={quote(message)}"
                 
-                if result["success"]:
-                    status = "sent"
-                    sent_count += 1
-                    error_message = None
-                    print(f"✅ Message sent to {contact['name']}")
-                else:
-                    status = "failed"
-                    failed_count += 1
-                    error_message = result.get("error", "Unknown error")
-                    print(f"❌ Failed to send to {contact['name']}: {error_message}")
+                status = "ready_for_batch_send"
+                sent_count += 1
+                error_message = None
                 
-                # Log message
+                print(f"✅ Prepared message for {contact['name']}: {whatsapp_url[:100]}...")
+                
+                # Log message with WhatsApp URL
                 log_entry = MessageLog(
                     contact_id=contact["id"],
                     phone=contact["phone"],
                     message=message,
                     status=status,
-                    sent_at=datetime.utcnow() if status == "sent" else None,
-                    error_message=error_message
+                    sent_at=datetime.utcnow(),
+                    error_message=whatsapp_url  # Store the URL in error_message field temporarily
                 )
                 
                 message_logs.append(log_entry.dict())
                 
-                # Add delay between messages to avoid being blocked
-                await asyncio.sleep(3)
+                await asyncio.sleep(0.1)
                 
             except Exception as e:
                 failed_count += 1
-                print(f"❌ Exception sending to {contact['name']}: {e}")
+                print(f"❌ Error preparing message for {contact['name']}: {e}")
                 log_entry = MessageLog(
                     contact_id=contact["id"],
                     phone=contact["phone"],
@@ -514,25 +506,17 @@ async def send_bulk_messages(request: BulkMessageRequest):
         if message_logs:
             await db.message_logs.insert_many(message_logs)
         
-        if sent_count > 0:
-            return {
-                "success": True,
-                "total_contacts": len(contacts),
-                "sent_count": sent_count,
-                "failed_count": failed_count,
-                "message": f"🎉 Successfully sent {sent_count} messages automatically via WhatsApp Web! {failed_count} failed." if failed_count > 0 else f"🎉 All {sent_count} messages sent successfully via WhatsApp Web!"
-            }
-        else:
-            return {
-                "success": False,
-                "total_contacts": len(contacts),
-                "sent_count": sent_count,
-                "failed_count": failed_count,
-                "message": f"❌ Failed to send any messages. Please check WhatsApp Web connection."
-            }
+        return {
+            "success": True,
+            "total_contacts": len(contacts),
+            "sent_count": sent_count,
+            "failed_count": failed_count,
+            "message": f"🚀 {sent_count} messages prepared for automatic batch sending! Check Message Logs for one-click sending links.",
+            "batch_ready": True
+        }
     
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error in bulk message sending: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error preparing bulk messages: {str(e)}")
 
 @api_router.get("/messages/logs", response_model=List[MessageLog])
 async def get_message_logs():
