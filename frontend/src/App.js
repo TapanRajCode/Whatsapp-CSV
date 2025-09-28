@@ -1566,7 +1566,7 @@ console.log('Click "⚛️ START QUANTUM SEND" or run: enhancedSender.startSendi
                               const success = await copyToClipboard(script);
                               
                               if (success) {
-                                alert('💥 NUCLEAR AUTO-SEND SCRIPT 2025 COPIED!\n\n🚨 NUCLEAR Features:\n• Green button hunting (targets exact WhatsApp send button)\n• SVG arrow detection and clicking\n• Position-based targeting (bottom-right area)\n• Brute force clicking on compose elements\n• Nuclear click sequences with overlay removal\n• Touch event simulation for mobile compatibility\n• Multiple keyboard simulation variations\n\nInstructions:\n1. Open WhatsApp Web & login\n2. F12 → Console tab\n3. Paste script → Press Enter\n4. Click "💥 START NUCLEAR SEND"\n\nThis NUCLEAR version targets the exact green send button from your screenshot!');
+                                alert('⚛️ QUANTUM AUTO-SEND SCRIPT 2025 COPIED!\n\n🔬 QUANTUM Features:\n• React component hijacking (direct component access)\n• WhatsApp Store direct access (internal API)\n• DOM event cascade (all possible event types)\n• Form submission hijacking\n• Memory patching (runtime behavior modification)\n• Direct DOM manipulation (force send via clearing)\n\nInstructions:\n1. Open WhatsApp Web & login\n2. F12 → Console tab\n3. Paste script → Press Enter\n4. Click "⚛️ START QUANTUM SEND"\n\nThis QUANTUM version bypasses traditional click methods entirely!');
                               } else {
                                 // Show the script in a popup if copy fails
                                 const popup = window.open('', 'script', 'width=800,height=600,scrollbars=yes');
