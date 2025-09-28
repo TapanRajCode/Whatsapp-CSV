@@ -917,134 +917,214 @@ class EnhancedWhatsAppSender {
       'button[data-testid="compose-btn-send"]', // Primary 2025 selector
       'button[data-testid="send"]', // Alternative 2025 selector
       'span[data-testid="send"]', // Sometimes it's a span
-      'button[aria-label="Send"]',
+      'button[aria-label*="Send"]', // More flexible aria-label matching
+      'button[title*="Send"]', // More flexible title matching
       'div[role="button"][data-testid*="send"]',
-      'button[title="Send"]',
       '[data-icon="send"]',
-      'button svg[data-icon="send"]'
+      'button svg[data-icon="send"]',
+      // Additional 2025 selectors
+      'button[class*="send"]',
+      'span[class*="send"][role="button"]'
     ];
     
     for (const selector of sendButtonSelectors) {
       const buttons = document.querySelectorAll(selector);
       for (const button of buttons) {
-        if (this.isVisibleAndClickable(button)) {
+        if (this.isVisibleAndClickable(button) && this.isSendButtonByPosition(button)) {
           console.log(\`✅ Found send button with selector: \${selector}\`);
           return button;
         }
       }
     }
     
-    // Fallback: search by visual characteristics
-    const allButtons = document.querySelectorAll('button, div[role="button"], span[role="button"]');
-    for (const button of allButtons) {
-      if (this.isSendButtonByContext(button)) {
-        console.log('✅ Found send button by context analysis');
-        return button;
+    // Enhanced fallback: AI-like context analysis
+    const allClickables = document.querySelectorAll('button, div[role="button"], span[role="button"], [tabindex="0"]');
+    for (const element of allClickables) {
+      if (this.isSendButtonByAdvancedAnalysis(element)) {
+        console.log('✅ Found send button by advanced analysis');
+        return element;
       }
     }
     
     return null;
   }
 
-  isVisibleAndClickable(element) {
-    if (!element || !element.offsetParent) return false;
-    const rect = element.getBoundingClientRect();
-    return rect.width > 0 && rect.height > 0 && 
-           rect.top >= 0 && rect.left >= 0;
-  }
-
-  isSendButtonByContext(element) {
-    if (!this.isVisibleAndClickable(element)) return false;
-    
-    // Check if button is in the compose area (bottom of screen)
+  isSendButtonByPosition(element) {
     const rect = element.getBoundingClientRect();
     const windowHeight = window.innerHeight;
-    if (rect.top < windowHeight * 0.7) return false;
+    const windowWidth = window.innerWidth;
     
-    // Check for send-related attributes or content
-    const hasIcon = element.querySelector('svg');
-    const dataIcon = element.getAttribute('data-icon');
-    const ariaLabel = element.getAttribute('aria-label');
-    const title = element.getAttribute('title');
+    // Must be in bottom area and right side (typical send button position)
+    return rect.top > windowHeight * 0.7 && rect.left > windowWidth * 0.7;
+  }
+
+  isSendButtonByAdvancedAnalysis(element) {
+    if (!this.isVisibleAndClickable(element)) return false;
     
-    return hasIcon && (
-      (dataIcon && dataIcon.includes('send')) ||
-      (ariaLabel && ariaLabel.toLowerCase().includes('send')) ||
-      (title && title.toLowerCase().includes('send'))
+    // Position analysis
+    const rect = element.getBoundingClientRect();
+    const windowHeight = window.innerHeight;
+    const windowWidth = window.innerWidth;
+    
+    // Must be in compose area (bottom right)
+    if (rect.top < windowHeight * 0.6 || rect.left < windowWidth * 0.5) return false;
+    
+    // Visual characteristics analysis
+    const styles = window.getComputedStyle(element);
+    const hasCircularShape = styles.borderRadius && parseInt(styles.borderRadius) > 20;
+    const hasIcon = element.querySelector('svg, [data-icon]');
+    const hasGreenish = styles.backgroundColor && (
+      styles.backgroundColor.includes('rgb(37, 211, 102)') || // WhatsApp green
+      styles.backgroundColor.includes('#25d366') ||
+      styles.backgroundColor.includes('rgb(0, 168, 132)') // Alternative green
     );
+    
+    // Text content analysis
+    const text = element.textContent || '';
+    const ariaLabel = element.getAttribute('aria-label') || '';
+    const title = element.getAttribute('title') || '';
+    const combinedText = (text + ariaLabel + title).toLowerCase();
+    
+    const hasSendKeywords = combinedText.includes('send') || combinedText.includes('enviar');
+    
+    // Parent container analysis
+    const parent = element.closest('[contenteditable], [data-testid*="compose"], .compose');
+    const isInComposeArea = !!parent;
+    
+    return (hasIcon && hasCircularShape) || 
+           (hasIcon && hasGreenish) || 
+           (hasSendKeywords && hasIcon) ||
+           (isInComposeArea && hasIcon && hasCircularShape);
   }
 
-  // Find message input using latest selectors
-  async findMessageInput() {
-    const inputSelectors = [
-      'div[contenteditable="true"][data-testid="conversation-compose-box-input"]', // 2025 primary
-      'div[contenteditable="true"][data-tab="10"]', // Legacy but still used
-      'div[contenteditable="true"][role="textbox"]',
-      'div[contenteditable="true"]', // Fallback
-      '[data-testid="conversation-compose-box-input"]'
-    ];
+  // Ultra-enhanced send attempt with proper event sequence
+  async ultraEnhancedSendAttempt() {
+    console.log('🚀 Starting ULTRA-ENHANCED send attempt...');
     
-    for (const selector of inputSelectors) {
-      const input = document.querySelector(selector);
-      if (input && this.isVisibleAndClickable(input)) {
-        console.log(\`✅ Found input with selector: \${selector}\`);
-        return input;
-      }
-    }
+    // Wait for page to fully stabilize
+    await this.sleep(4000);
     
-    return null;
-  }
-
-  // Enhanced send attempt with multiple strategies
-  async enhancedSendAttempt() {
-    console.log('🚀 Starting enhanced send attempt...');
-    
-    // Wait for page to fully load
-    await this.sleep(3000);
-    
-    // Strategy 1: Direct send button click (most reliable)
-    console.log('🎯 Strategy 1: Direct send button click');
+    // Strategy 1: Perfect event sequence simulation (MOST IMPORTANT)
+    console.log('🎯 Strategy 1: Perfect event sequence simulation');
     const sendButton = await this.findSendButton();
     if (sendButton) {
-      await this.humanMouseMove(sendButton);
-      await this.sleep(this.randomDelay(200, 500));
+      console.log('Found send button, executing perfect event sequence...');
       
-      // Human-like click sequence
-      sendButton.dispatchEvent(new MouseEvent('mousedown', { 
-        bubbles: true, cancelable: true,
-        clientX: sendButton.getBoundingClientRect().left + sendButton.getBoundingClientRect().width / 2,
-        clientY: sendButton.getBoundingClientRect().top + sendButton.getBoundingClientRect().height / 2
-      }));
-      await this.sleep(this.randomDelay(50, 150));
+      // Get button position for realistic mouse events
+      const rect = sendButton.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
       
-      sendButton.dispatchEvent(new MouseEvent('mouseup', { 
-        bubbles: true, cancelable: true 
-      }));
-      await this.sleep(this.randomDelay(30, 80));
+      // Add slight randomness to seem more human
+      const offsetX = (Math.random() - 0.5) * 4;
+      const offsetY = (Math.random() - 0.5) * 4;
+      const clientX = centerX + offsetX;
+      const clientY = centerY + offsetY;
       
-      sendButton.dispatchEvent(new MouseEvent('click', { 
-        bubbles: true, cancelable: true 
-      }));
+      // Step 1: Focus the button
+      sendButton.focus();
+      await this.sleep(this.randomDelay(100, 200));
       
-      await this.sleep(2000);
+      // Step 2: Dispatch complete pointer/mouse event sequence
+      const eventOptions = {
+        bubbles: true,
+        cancelable: true,
+        clientX: clientX,
+        clientY: clientY,
+        button: 0, // Left mouse button
+        buttons: 1
+      };
+      
+      // Modern browsers use pointer events first
+      sendButton.dispatchEvent(new PointerEvent('pointerdown', eventOptions));
+      await this.sleep(this.randomDelay(20, 50));
+      
+      sendButton.dispatchEvent(new MouseEvent('mousedown', eventOptions));
+      await this.sleep(this.randomDelay(80, 150)); // Human-like press duration
+      
+      sendButton.dispatchEvent(new PointerEvent('pointerup', eventOptions));
+      await this.sleep(this.randomDelay(10, 30));
+      
+      sendButton.dispatchEvent(new MouseEvent('mouseup', eventOptions));
+      await this.sleep(this.randomDelay(10, 30));
+      
+      sendButton.dispatchEvent(new MouseEvent('click', eventOptions));
+      await this.sleep(this.randomDelay(20, 50));
+      
+      // Additional click event variations for maximum compatibility
+      const clickEvent = new Event('click', { bubbles: true, cancelable: true });
+      sendButton.dispatchEvent(clickEvent);
+      
+      await this.sleep(3000);
       if (await this.checkMessageSent()) {
-        console.log('✅ Success with direct button click!');
+        console.log('✅ SUCCESS with perfect event sequence!');
         return true;
       }
     }
     
-    // Strategy 2: Enter key simulation on message input
-    console.log('🎯 Strategy 2: Enter key on message input');
+    // Strategy 2: Alternative button finding and clicking
+    console.log('🎯 Strategy 2: Alternative button detection');
+    const altButtons = document.querySelectorAll('button, div[role="button"], span[role="button"]');
+    for (const button of altButtons) {
+      if (this.isSendButtonByAdvancedAnalysis(button)) {
+        console.log('Trying alternative button...');
+        
+        // Try the same perfect event sequence
+        button.focus();
+        await this.sleep(100);
+        
+        const rect = button.getBoundingClientRect();
+        const eventOpts = {
+          bubbles: true,
+          cancelable: true,
+          clientX: rect.left + rect.width / 2,
+          clientY: rect.top + rect.height / 2,
+          button: 0,
+          buttons: 1
+        };
+        
+        button.dispatchEvent(new PointerEvent('pointerdown', eventOpts));
+        await this.sleep(50);
+        button.dispatchEvent(new MouseEvent('mousedown', eventOpts));
+        await this.sleep(100);
+        button.dispatchEvent(new PointerEvent('pointerup', eventOpts));
+        await this.sleep(30);
+        button.dispatchEvent(new MouseEvent('mouseup', eventOpts));
+        await this.sleep(30);
+        button.dispatchEvent(new MouseEvent('click', eventOpts));
+        
+        await this.sleep(2000);
+        if (await this.checkMessageSent()) {
+          console.log('✅ SUCCESS with alternative button!');
+          return true;
+        }
+      }
+    }
+    
+    // Strategy 3: Enhanced Enter key with focus management
+    console.log('🎯 Strategy 3: Enhanced Enter key simulation');
     const messageInput = await this.findMessageInput();
     if (messageInput) {
+      // Ensure input has focus and cursor is at end
       messageInput.focus();
-      await this.sleep(this.randomDelay(100, 200));
+      await this.sleep(200);
+      
+      // Set cursor to end of text
+      const range = document.createRange();
+      const sel = window.getSelection();
+      range.selectNodeContents(messageInput);
+      range.collapse(false);
+      sel.removeAllRanges();
+      sel.addRange(range);
+      
+      await this.sleep(100);
       
       // Comprehensive Enter key event sequence
       const enterEvents = [
         new KeyboardEvent('keydown', { 
           key: 'Enter', code: 'Enter', keyCode: 13, which: 13, 
-          bubbles: true, cancelable: true 
+          bubbles: true, cancelable: true,
+          isTrusted: false // Explicitly set as automated
         }),
         new KeyboardEvent('keypress', { 
           key: 'Enter', code: 'Enter', keyCode: 13, which: 13, 
@@ -1058,34 +1138,41 @@ class EnhancedWhatsAppSender {
       
       for (const event of enterEvents) {
         messageInput.dispatchEvent(event);
-        await this.sleep(this.randomDelay(30, 80));
+        await this.sleep(this.randomDelay(50, 100));
       }
       
       await this.sleep(2000);
       if (await this.checkMessageSent()) {
-        console.log('✅ Success with Enter key!');
+        console.log('✅ SUCCESS with enhanced Enter key!');
         return true;
       }
     }
     
-    // Strategy 3: Form submission
-    console.log('🎯 Strategy 3: Form submission');
-    const form = document.querySelector('form');
-    if (form) {
+    // Strategy 4: Force form submission
+    console.log('🎯 Strategy 4: Enhanced form submission');
+    const forms = document.querySelectorAll('form');
+    for (const form of forms) {
       try {
-        const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
-        form.dispatchEvent(submitEvent);
+        // Try different form submission methods
+        form.requestSubmit(); // Modern method
+        await this.sleep(1000);
+        if (await this.checkMessageSent()) {
+          console.log('✅ SUCCESS with form requestSubmit!');
+          return true;
+        }
+        
+        form.submit(); // Legacy method
         await this.sleep(2000);
         if (await this.checkMessageSent()) {
-          console.log('✅ Success with form submission!');
+          console.log('✅ SUCCESS with form submit!');
           return true;
         }
       } catch (e) {
-        console.log('Form submission failed:', e);
+        console.log('Form submission method failed:', e);
       }
     }
     
-    console.log('❌ All send strategies failed');
+    console.log('❌ All ultra-enhanced strategies failed');
     return false;
   }
 
