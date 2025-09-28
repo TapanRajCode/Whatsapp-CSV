@@ -142,17 +142,14 @@ const WhatsAppMessenger = () => {
 
   const checkWhatsAppStatus = async () => {
     try {
-      // First check if WhatsApp Web is open in another tab/window
-      const whatsappWebConnected = checkWhatsAppWebInOtherTabs();
-      
       const response = await axios.get(`${API}/whatsapp/status`);
       
-      // Override status if WhatsApp Web is detected in another tab
-      if (whatsappWebConnected) {
+      // Check for manual override or existing detection
+      if (whatsappManualOverride) {
         setWhatsappStatus({
           authenticated: true,
           qr_available: false,
-          message: '✅ WhatsApp Web is connected in another browser tab!'
+          message: '✅ WhatsApp manually marked as connected!'
         });
       } else {
         setWhatsappStatus(response.data);
