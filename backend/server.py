@@ -15,6 +15,8 @@ import io
 import re
 import json
 import asyncio
+import time
+import shutil
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
