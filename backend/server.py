@@ -448,6 +448,11 @@ async def send_bulk_messages(request: BulkMessageRequest):
         contact_filter = {"id": {"$in": request.contact_ids}} if request.contact_ids else {}
         contacts = await db.contacts.find(contact_filter).to_list(1000)
         
+        # First, clear any existing ready_for_batch_send logs to avoid duplicates
+        await db.message_logs.delete_many({"status": "ready_for_batch_send"})
+        await db.message_logs.delete_many({"status": "ready_to_send"})
+        await db.message_logs.delete_many({"status": "demo_sent"})
+        
         message_logs = []
         sent_count = 0
         failed_count = 0
