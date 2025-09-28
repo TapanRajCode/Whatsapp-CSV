@@ -278,12 +278,14 @@ const WhatsAppMessenger = () => {
     setShowEmojiPicker(false);
   };
 
-  const commonEmojis = [
-    '😊', '😍', '🤗', '😘', '😎', '🤩', '😂', '🤣', 
-    '❤️', '💕', '💖', '💯', '🔥', '✨', '🎉', '🎊',
-    '👍', '👏', '🙌', '💪', '🤝', '🙏', '👋', '🤞',
-    '🎵', '🎶', '🎤', '🎸', '🎯', '⚡', '🌟', '💫'
-  ];
+  const clearLogs = async () => {
+    try {
+      await axios.delete(`${API}/messages/logs`);
+      setMessageLogs([]);
+    } catch (error) {
+      console.error('Error clearing logs:', error);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50">
