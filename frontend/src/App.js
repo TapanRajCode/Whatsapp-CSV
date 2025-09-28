@@ -419,18 +419,21 @@ const WhatsAppMessenger = () => {
         </Card>
 
         <Tabs defaultValue="upload" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="upload" className="flex items-center gap-2">
               <Upload className="h-4 w-4" /> Upload Contacts
             </TabsTrigger>
             <TabsTrigger value="message" className="flex items-center gap-2">
               <FileText className="h-4 w-4" /> Create Message
             </TabsTrigger>
+            <TabsTrigger value="bulk-send" className="flex items-center gap-2">
+              <Send className="h-4 w-4" /> Bulk Send ({contacts.length})
+            </TabsTrigger>
             <TabsTrigger value="contacts" className="flex items-center gap-2">
               <Users className="h-4 w-4" /> Contacts ({contacts.length})
             </TabsTrigger>
             <TabsTrigger value="logs" className="flex items-center gap-2">
-              <Send className="h-4 w-4" /> Message Logs
+              <MessageSquare className="h-4 w-4" /> Message Logs
             </TabsTrigger>
           </TabsList>
 
