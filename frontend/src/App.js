@@ -997,183 +997,263 @@ class EnhancedWhatsAppSender {
            (isInComposeArea && hasIcon && hasCircularShape);
   }
 
-  // Ultra-enhanced send attempt with proper event sequence
-  async ultraEnhancedSendAttempt() {
-    console.log('🚀 Starting ULTRA-ENHANCED send attempt...');
+  // NUCLEAR-LEVEL send attempt - most aggressive approach
+  async nuclearSendAttempt() {
+    console.log('💥 NUCLEAR SEND ATTEMPT - Most Aggressive Mode');
     
-    // Wait for page to fully stabilize
-    await this.sleep(4000);
+    // Wait for interface to stabilize
+    await this.sleep(5000);
     
-    // Strategy 1: Perfect event sequence simulation (MOST IMPORTANT)
-    console.log('🎯 Strategy 1: Perfect event sequence simulation');
-    const sendButton = await this.findSendButton();
-    if (sendButton) {
-      console.log('Found send button, executing perfect event sequence...');
-      
-      // Get button position for realistic mouse events
-      const rect = sendButton.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
-      
-      // Add slight randomness to seem more human
-      const offsetX = (Math.random() - 0.5) * 4;
-      const offsetY = (Math.random() - 0.5) * 4;
-      const clientX = centerX + offsetX;
-      const clientY = centerY + offsetY;
-      
-      // Step 1: Focus the button
-      sendButton.focus();
-      await this.sleep(this.randomDelay(100, 200));
-      
-      // Step 2: Dispatch complete pointer/mouse event sequence
-      const eventOptions = {
-        bubbles: true,
-        cancelable: true,
-        clientX: clientX,
-        clientY: clientY,
-        button: 0, // Left mouse button
-        buttons: 1
-      };
-      
-      // Modern browsers use pointer events first
-      sendButton.dispatchEvent(new PointerEvent('pointerdown', eventOptions));
-      await this.sleep(this.randomDelay(20, 50));
-      
-      sendButton.dispatchEvent(new MouseEvent('mousedown', eventOptions));
-      await this.sleep(this.randomDelay(80, 150)); // Human-like press duration
-      
-      sendButton.dispatchEvent(new PointerEvent('pointerup', eventOptions));
-      await this.sleep(this.randomDelay(10, 30));
-      
-      sendButton.dispatchEvent(new MouseEvent('mouseup', eventOptions));
-      await this.sleep(this.randomDelay(10, 30));
-      
-      sendButton.dispatchEvent(new MouseEvent('click', eventOptions));
-      await this.sleep(this.randomDelay(20, 50));
-      
-      // Additional click event variations for maximum compatibility
-      const clickEvent = new Event('click', { bubbles: true, cancelable: true });
-      sendButton.dispatchEvent(clickEvent);
-      
-      await this.sleep(3000);
-      if (await this.checkMessageSent()) {
-        console.log('✅ SUCCESS with perfect event sequence!');
-        return true;
-      }
-    }
+    // Strategy 1: Green button hunt - specifically target the green send button
+    console.log('🎯 Strategy 1: Green Button Hunt (Targeting exact send button from screenshot)');
     
-    // Strategy 2: Alternative button finding and clicking
-    console.log('🎯 Strategy 2: Alternative button detection');
-    const altButtons = document.querySelectorAll('button, div[role="button"], span[role="button"]');
-    for (const button of altButtons) {
-      if (this.isSendButtonByAdvancedAnalysis(button)) {
-        console.log('Trying alternative button...');
+    const greenButtons = Array.from(document.querySelectorAll('*')).filter(el => {
+      const styles = window.getComputedStyle(el);
+      const bgColor = styles.backgroundColor;
+      const isGreen = bgColor.includes('25, 211, 102') || // WhatsApp green
+                     bgColor.includes('#25d366') ||
+                     bgColor.includes('rgb(0, 168, 132)') ||
+                     bgColor.includes('#00a884') ||
+                     el.getAttribute('fill') === '#00a884' ||
+                     el.getAttribute('fill') === '#25d366';
+      
+      const hasTriangle = el.querySelector('svg') || 
+                         el.querySelector('[data-icon="send"]') ||
+                         el.querySelector('[data-testid="send"]');
+      
+      return isGreen || hasTriangle;
+    });
+    
+    console.log(\`Found \${greenButtons.length} green/send elements\`);
+    
+    for (const button of greenButtons) {
+      if (this.isVisibleAndClickable(button)) {
+        console.log('Attempting NUCLEAR click on green button:', button.outerHTML.substring(0, 100));
         
-        // Try the same perfect event sequence
-        button.focus();
-        await this.sleep(100);
-        
-        const rect = button.getBoundingClientRect();
-        const eventOpts = {
-          bubbles: true,
-          cancelable: true,
-          clientX: rect.left + rect.width / 2,
-          clientY: rect.top + rect.height / 2,
-          button: 0,
-          buttons: 1
-        };
-        
-        button.dispatchEvent(new PointerEvent('pointerdown', eventOpts));
-        await this.sleep(50);
-        button.dispatchEvent(new MouseEvent('mousedown', eventOpts));
-        await this.sleep(100);
-        button.dispatchEvent(new PointerEvent('pointerup', eventOpts));
-        await this.sleep(30);
-        button.dispatchEvent(new MouseEvent('mouseup', eventOpts));
-        await this.sleep(30);
-        button.dispatchEvent(new MouseEvent('click', eventOpts));
-        
+        // NUCLEAR click sequence
+        await this.nuclearClick(button);
         await this.sleep(2000);
+        
         if (await this.checkMessageSent()) {
-          console.log('✅ SUCCESS with alternative button!');
+          console.log('💥 NUCLEAR SUCCESS with green button!');
           return true;
         }
       }
     }
     
-    // Strategy 3: Enhanced Enter key with focus management
-    console.log('🎯 Strategy 3: Enhanced Enter key simulation');
+    // Strategy 2: SVG Hunt - target send arrow SVG directly
+    console.log('🎯 Strategy 2: SVG Arrow Hunt');
+    const svgElements = document.querySelectorAll('svg, path');
+    
+    for (const svg of svgElements) {
+      const parent = svg.closest('button, div[role="button"], span[role="button"]');
+      if (parent && this.isInSendButtonArea(parent)) {
+        console.log('Found SVG in send area, attempting click...');
+        await this.nuclearClick(parent);
+        await this.sleep(2000);
+        
+        if (await this.checkMessageSent()) {
+          console.log('💥 NUCLEAR SUCCESS with SVG parent!');
+          return true;
+        }
+      }
+    }
+    
+    // Strategy 3: Position-based hunt (bottom-right area)
+    console.log('🎯 Strategy 3: Position-Based Hunt (Bottom-Right Area)');
+    const allClickables = document.querySelectorAll('button, div, span, svg');
+    
+    for (const element of allClickables) {
+      const rect = element.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      const windowWidth = window.innerWidth;
+      
+      // Must be in bottom-right corner (like in screenshot)
+      if (rect.top > windowHeight * 0.8 && rect.left > windowWidth * 0.8 && 
+          rect.width > 20 && rect.width < 100 && rect.height > 20 && rect.height < 100) {
+        
+        console.log('Found bottom-right element, attempting click...');
+        await this.nuclearClick(element);
+        await this.sleep(2000);
+        
+        if (await this.checkMessageSent()) {
+          console.log('💥 NUCLEAR SUCCESS with position-based!');
+          return true;
+        }
+      }
+    }
+    
+    // Strategy 4: Brute force on ALL elements in compose area
+    console.log('🎯 Strategy 4: BRUTE FORCE - All elements in compose area');
+    const composeArea = document.querySelector('footer, [data-testid*="compose"], .compose');
+    
+    if (composeArea) {
+      const allElements = composeArea.querySelectorAll('*');
+      console.log(\`Brute forcing \${allElements.length} elements in compose area\`);
+      
+      for (const element of allElements) {
+        if (this.isVisibleAndClickable(element) && element.offsetWidth < 100) {
+          await this.nuclearClick(element);
+          await this.sleep(500);
+          
+          if (await this.checkMessageSent()) {
+            console.log('💥 NUCLEAR SUCCESS with brute force!');
+            return true;
+          }
+        }
+      }
+    }
+    
+    // Strategy 5: Keyboard simulation with different approaches
+    console.log('🎯 Strategy 5: NUCLEAR Keyboard Simulation');
     const messageInput = await this.findMessageInput();
     if (messageInput) {
-      // Ensure input has focus and cursor is at end
+      // Focus and multiple Enter attempts
       messageInput.focus();
       await this.sleep(200);
       
-      // Set cursor to end of text
-      const range = document.createRange();
-      const sel = window.getSelection();
-      range.selectNodeContents(messageInput);
-      range.collapse(false);
-      sel.removeAllRanges();
-      sel.addRange(range);
-      
-      await this.sleep(100);
-      
-      // Comprehensive Enter key event sequence
-      const enterEvents = [
-        new KeyboardEvent('keydown', { 
-          key: 'Enter', code: 'Enter', keyCode: 13, which: 13, 
-          bubbles: true, cancelable: true,
-          isTrusted: false // Explicitly set as automated
-        }),
-        new KeyboardEvent('keypress', { 
-          key: 'Enter', code: 'Enter', keyCode: 13, which: 13, 
-          bubbles: true, cancelable: true 
-        }),
-        new KeyboardEvent('keyup', { 
-          key: 'Enter', code: 'Enter', keyCode: 13, which: 13, 
-          bubbles: true, cancelable: true 
-        })
+      // Try different Enter key combinations
+      const enterVariations = [
+        { key: 'Enter', shiftKey: false },
+        { key: 'Enter', ctrlKey: true },
+        { key: 'Enter', altKey: false, metaKey: false },
+        { key: 'NumpadEnter', keyCode: 13 }
       ];
       
-      for (const event of enterEvents) {
+      for (const variation of enterVariations) {
+        const event = new KeyboardEvent('keydown', {
+          key: variation.key,
+          keyCode: variation.keyCode || 13,
+          which: 13,
+          shiftKey: variation.shiftKey || false,
+          ctrlKey: variation.ctrlKey || false,
+          altKey: variation.altKey || false,
+          metaKey: variation.metaKey || false,
+          bubbles: true,
+          cancelable: true
+        });
+        
         messageInput.dispatchEvent(event);
-        await this.sleep(this.randomDelay(50, 100));
-      }
-      
-      await this.sleep(2000);
-      if (await this.checkMessageSent()) {
-        console.log('✅ SUCCESS with enhanced Enter key!');
-        return true;
-      }
-    }
-    
-    // Strategy 4: Force form submission
-    console.log('🎯 Strategy 4: Enhanced form submission');
-    const forms = document.querySelectorAll('form');
-    for (const form of forms) {
-      try {
-        // Try different form submission methods
-        form.requestSubmit(); // Modern method
+        await this.sleep(100);
+        
+        const keyupEvent = new KeyboardEvent('keyup', {
+          key: variation.key,
+          keyCode: variation.keyCode || 13,
+          bubbles: true
+        });
+        messageInput.dispatchEvent(keyupEvent);
+        
         await this.sleep(1000);
         if (await this.checkMessageSent()) {
-          console.log('✅ SUCCESS with form requestSubmit!');
+          console.log('💥 NUCLEAR SUCCESS with keyboard variation!');
           return true;
         }
-        
-        form.submit(); // Legacy method
-        await this.sleep(2000);
-        if (await this.checkMessageSent()) {
-          console.log('✅ SUCCESS with form submit!');
-          return true;
-        }
-      } catch (e) {
-        console.log('Form submission method failed:', e);
       }
     }
     
-    console.log('❌ All ultra-enhanced strategies failed');
+    console.log('💥 NUCLEAR ATTEMPT FAILED - All strategies exhausted');
     return false;
+  }
+
+  // NUCLEAR click method - most aggressive clicking
+  async nuclearClick(element) {
+    console.log('💥 Executing NUCLEAR click sequence...');
+    
+    // Get element center
+    const rect = element.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    // Scroll element into view
+    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    await this.sleep(100);
+    
+    // Remove any overlays that might block the click
+    const overlays = document.querySelectorAll('.overlay, .modal, .popup, [style*="z-index"]');
+    overlays.forEach(overlay => {
+      if (parseInt(window.getComputedStyle(overlay).zIndex) > 1000) {
+        overlay.style.display = 'none';
+      }
+    });
+    
+    // Multiple focus attempts
+    if (element.focus) element.focus();
+    if (element.click) element.click(); // Direct click first
+    
+    // Event sequence 1: Complete pointer/mouse sequence
+    const eventOptions = {
+      bubbles: true,
+      cancelable: true,
+      clientX: centerX,
+      clientY: centerY,
+      button: 0,
+      buttons: 1,
+      view: window
+    };
+    
+    element.dispatchEvent(new PointerEvent('pointerover', eventOptions));
+    await this.sleep(50);
+    element.dispatchEvent(new PointerEvent('pointerenter', eventOptions));
+    await this.sleep(50);
+    element.dispatchEvent(new PointerEvent('pointerdown', eventOptions));
+    await this.sleep(100);
+    element.dispatchEvent(new MouseEvent('mousedown', eventOptions));
+    await this.sleep(50);
+    element.dispatchEvent(new PointerEvent('pointerup', eventOptions));
+    await this.sleep(50);
+    element.dispatchEvent(new MouseEvent('mouseup', eventOptions));
+    await this.sleep(50);
+    element.dispatchEvent(new MouseEvent('click', eventOptions));
+    await this.sleep(50);
+    element.dispatchEvent(new PointerEvent('pointerout', eventOptions));
+    
+    // Event sequence 2: Touch events (for mobile compatibility)
+    const touchOptions = {
+      bubbles: true,
+      cancelable: true,
+      touches: [{
+        clientX: centerX,
+        clientY: centerY,
+        target: element
+      }]
+    };
+    
+    element.dispatchEvent(new TouchEvent('touchstart', touchOptions));
+    await this.sleep(100);
+    element.dispatchEvent(new TouchEvent('touchend', touchOptions));
+    
+    // Event sequence 3: Legacy events
+    element.dispatchEvent(new Event('click', { bubbles: true }));
+    element.dispatchEvent(new Event('mousedown', { bubbles: true }));
+    element.dispatchEvent(new Event('mouseup', { bubbles: true }));
+    
+    // Direct DOM manipulation attempts
+    if (element.onclick) {
+      try {
+        element.onclick();
+      } catch (e) {}
+    }
+    
+    // Trigger any parent click handlers
+    let parent = element.parentElement;
+    while (parent && parent !== document.body) {
+      if (parent.onclick || parent.addEventListener) {
+        parent.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      }
+      parent = parent.parentElement;
+    }
+  }
+
+  isInSendButtonArea(element) {
+    const rect = element.getBoundingClientRect();
+    const windowHeight = window.innerHeight;
+    const windowWidth = window.innerWidth;
+    
+    // Based on screenshot - send button is in bottom-right area
+    return rect.top > windowHeight * 0.75 && 
+           rect.left > windowWidth * 0.7 &&
+           rect.width > 15 && rect.width < 80 &&
+           rect.height > 15 && rect.height < 80;
   }
 
   async checkMessageSent() {
