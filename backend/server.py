@@ -163,39 +163,78 @@ def get_qr_code():
         pass
     return None
 
-async def send_whatsapp_message(phone: str, message: str) -> dict:
+async def send_whatsapp_message_real(phone: str, message: str) -> dict:
     global driver
     try:
-        if not driver or not whatsapp_authenticated:
-            return {"success": False, "error": "WhatsApp not authenticated"}
+        if not driver:
+            return {"success": False, "error": "WhatsApp driver not initialized"}
         
-        # Format phone number
-        phone = re.sub(r'\D', '', phone)
-        if not phone.startswith('+'):
-            phone = f"+{phone}"
+        # Format phone number (remove + and spaces)
+        phone_clean = re.sub(r'[^\d]', '', phone)
+        if phone_clean.startswith('91') and len(phone_clean) > 10:
+            phone_clean = phone_clean[2:]  # Remove country code for URL
         
-        # Create WhatsApp Web URL
-        url = f"https://web.whatsapp.com/send?phone={phone}&text={quote(message)}"
+        # Create WhatsApp Web URL with message
+        encoded_message = quote(message)
+        url = f"https://web.whatsapp.com/send?phone=91{phone_clean}&text={encoded_message}"
+        
+        print(f"Navigating to: {url}")
         driver.get(url)
         
-        # Wait for page to load and send button to appear
-        await asyncio.sleep(3)
+        # Wait for page to load
+        await asyncio.sleep(5)
         
         try:
-            # Wait for and click send button
-            send_button = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, "//span[@data-testid='send']/../.."))
-            )
-            send_button.click()
+            # Wait for and find the send button with multiple selectors
+            send_selectors = [
+                "//span[@data-testid='send']",
+                "//button[@data-testid='compose-btn-send']", 
+                "//span[contains(@class, 'send')]//parent::button",
+                "//*[@aria-label='Send' or @data-icon='send']",
+                "//div[@role='button' and contains(@aria-label, 'Send')]"
+            ]
             
-            # Wait a bit to ensure message is sent
-            await asyncio.sleep(2)
+            send_button = None
+            for selector in send_selectors:
+                try:
+                    send_button = WebDriverWait(driver, 10).until(
+                        EC.element_to_be_clickable((By.XPATH, selector))
+                    )
+                    print(f"Found send button with selector: {selector}")
+                    break
+                except TimeoutException:
+                    continue
             
-            return {"success": True}
-        except TimeoutException:
-            return {"success": False, "error": "Could not find send button or contact"}
+            if send_button:
+                # Click send button
+                driver.execute_script("arguments[0].click();", send_button)
+                print("Clicked send button")
+                
+                # Wait to ensure message is sent
+                await asyncio.sleep(3)
+                
+                return {"success": True}
+            else:
+                # If no send button found, try alternative approach
+                print("Send button not found, trying alternative method")
+                
+                # Try to find the text input and press Enter
+                try:
+                    text_input = WebDriverWait(driver, 5).until(
+                        EC.presence_of_element_located((By.XPATH, "//div[@contenteditable='true' and @data-tab='10']"))
+                    )
+                    text_input.send_keys(Keys.ENTER)
+                    await asyncio.sleep(2)
+                    return {"success": True}
+                except:
+                    return {"success": False, "error": "Could not find send mechanism"}
+                
+        except Exception as e:
+            print(f"Error finding send button: {e}")
+            return {"success": False, "error": f"Could not send message: {str(e)}"}
     
     except Exception as e:
+        print(f"Error in send_whatsapp_message_real: {e}")
         return {"success": False, "error": str(e)}
 
 # API Routes
