@@ -1471,10 +1471,10 @@ control.style.cssText = \`
 
 control.innerHTML = \`
   <div style="font-size: 20px; font-weight: bold; margin-bottom: 5px;">
-    💥 NUCLEAR SENDER 2025
+    ⚛️ QUANTUM SENDER 2025
   </div>
   <div style="font-size: 12px; margin-bottom: 15px; opacity: 0.9;">
-    Green button hunting • SVG detection • Nuclear click sequences
+    React hijacking • Store access • Memory patching
   </div>
   
   <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px; margin-bottom: 15px;">
@@ -1492,7 +1492,7 @@ control.innerHTML = \`
     box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
     transition: transform 0.2s;
   " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-    💥 START NUCLEAR SEND
+    ⚛️ START QUANTUM SEND
   </button>
   
   <button id="enhanced-stop" style="
@@ -1507,7 +1507,7 @@ control.innerHTML = \`
   </button>
   
   <div style="font-size: 11px; margin-top: 10px; opacity: 0.8; line-height: 1.4;">
-    Using perfect event sequences with pointer/mouse events
+    Quantum-level DOM and React component manipulation
   </div>
 \`;
 
