@@ -97,17 +97,7 @@ const WhatsAppMessenger = () => {
     return formattedText;
   };
 
-  const getPreviewMessage = () => {
-    if (!messageTemplate) return '';
-    
-    // Replace {name} with example name for preview
-    let preview = messageTemplate.replace(/{name}/g, '<span style="background: #e3f2fd; padding: 2px 4px; border-radius: 3px; color: #1565c0; font-weight: 500;">[Contact Name]</span>');
-    
-    // Replace other placeholders
-    preview = preview.replace(/{(\w+)}/g, '<span style="background: #f3e5f5; padding: 2px 4px; border-radius: 3px; color: #7b1fa2; font-weight: 500;">[$1]</span>');
-    
-    return renderWhatsAppFormatting(preview);
-  };
+  const insertEmoji = (emoji) => {
     const textarea = document.querySelector('textarea[placeholder*="Hi {name}"]');
     if (!textarea) return;
 
