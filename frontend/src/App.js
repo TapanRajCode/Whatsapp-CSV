@@ -781,98 +781,231 @@ Jane Smith,+0987654321,XYZ Inc
                         </div>
                         <Button
                           onClick={() => {
-                            const script = `
-// WhatsApp Automation Script - Paste this in WhatsApp Web Console (F12)
-(function() {
-  const contacts = ${JSON.stringify(contacts)};
-  const messageTemplate = "${messageTemplate.replace(/"/g, '\\"').replace(/\n/g, '\\n')}";
-  
-  class BulkSender {
-    constructor() {
-      this.queue = [];
-      this.currentIndex = 0;
-      this.isRunning = false;
+                            try {
+                              // Clean and prepare the data
+                              const cleanContacts = contacts.map(contact => ({
+                                name: contact.name,
+                                phone: contact.phone,
+                                additional_fields: contact.additional_fields || {}
+                              }));
+                              
+                              const cleanTemplate = messageTemplate.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n').replace(/\r/g, '');
+                              
+                              const script = `
+console.clear();
+console.log('🚀 WhatsApp Bulk Sender Loading...');
+
+// Contact data
+const contacts = ${JSON.stringify(cleanContacts, null, 2)};
+const messageTemplate = \`${messageTemplate}\`;
+
+console.log('📋 Loaded', contacts.length, 'contacts');
+console.log('📝 Message template ready');
+
+// Bulk Sender Class
+class WhatsAppBulkSender {
+  constructor() {
+    this.currentIndex = 0;
+    this.isRunning = false;
+    this.successCount = 0;
+    this.failCount = 0;
+  }
+
+  formatPhone(phone) {
+    let clean = phone.replace(/\\D/g, '');
+    if (clean.startsWith('91') && clean.length > 10) {
+      clean = clean.substring(2);
     }
-    
-    formatPhone(phone) {
-      return phone.replace(/\\D/g, '').replace(/^91/, '');
+    return clean;
+  }
+
+  personalizeMessage(template, contact) {
+    let message = template.replace(/{name}/g, contact.name);
+    if (contact.additional_fields) {
+      Object.keys(contact.additional_fields).forEach(field => {
+        const regex = new RegExp(\`{\${field}}\`, 'g');
+        message = message.replace(regex, contact.additional_fields[field]);
+      });
     }
+    return message;
+  }
+
+  async sendToContact(contact) {
+    const phone = this.formatPhone(contact.phone);
+    const message = this.personalizeMessage(messageTemplate, contact);
     
-    personalizeMessage(template, contact) {
-      return template.replace(/{name}/g, contact.name);
-    }
+    console.log(\`📱 Sending to \${contact.name} (\${contact.phone})\`);
     
-    async sendToContact(contact) {
-      const phone = this.formatPhone(contact.phone);
-      const message = this.personalizeMessage(messageTemplate, contact);
-      
-      // Create URL and navigate
+    try {
+      // Navigate to WhatsApp send URL
       const url = \`https://web.whatsapp.com/send?phone=91\${phone}&text=\${encodeURIComponent(message)}\`;
       window.location.href = url;
       
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          const sendBtn = document.querySelector('[data-testid="send"]') || 
-                        document.querySelector('[aria-label="Send"]') ||
-                        document.querySelector('[data-icon="send"]');
-          
-          if (sendBtn) {
-            sendBtn.click();
-            console.log(\`✅ Sent to \${contact.name} (\${contact.phone})\`);
-            resolve(true);
-          } else {
-            console.log(\`❌ Could not send to \${contact.name}\`);
-            resolve(false);
-          }
-        }, 3000);
-      });
-    }
-    
-    async startBulkSend() {
-      console.log('🚀 Starting bulk send for', contacts.length, 'contacts');
+      // Wait for page to load and send button to appear
+      await this.sleep(4000);
       
-      for (let i = 0; i < contacts.length; i++) {
-        console.log(\`Sending \${i+1}/\${contacts.length} to \${contacts[i].name}\`);
-        await this.sendToContact(contacts[i]);
-        
-        // Wait between messages
-        if (i < contacts.length - 1) {
-          console.log('Waiting 5 seconds before next message...');
-          await new Promise(resolve => setTimeout(resolve, 5000));
-        }
+      // Try to find and click send button
+      const sendButton = this.findSendButton();
+      
+      if (sendButton) {
+        sendButton.click();
+        console.log(\`✅ Message sent to \${contact.name}\`);
+        this.successCount++;
+        return true;
+      } else {
+        console.log(\`❌ Could not find send button for \${contact.name}\`);
+        this.failCount++;
+        return false;
       }
-      
-      console.log('🎉 Bulk sending completed!');
+    } catch (error) {
+      console.error(\`❌ Error sending to \${contact.name}:\`, error);
+      this.failCount++;
+      return false;
     }
   }
-  
-  window.bulkSender = new BulkSender();
-  
-  console.log('Automation loaded! Run: bulkSender.startBulkSend()');
-  console.log('Or click the START BULK SEND button that will appear');
-  
-  // Create a start button
-  const startBtn = document.createElement('div');
-  startBtn.innerHTML = '🚀 START BULK SEND';
-  startBtn.style.cssText = \`
+
+  findSendButton() {
+    const selectors = [
+      '[data-testid="send"]',
+      '[data-icon="send"]',
+      '[aria-label="Send"]',
+      'button[data-testid="compose-btn-send"]',
+      'span[data-testid="send"]'
+    ];
+    
+    for (const selector of selectors) {
+      const element = document.querySelector(selector);
+      if (element && element.offsetParent !== null) {
+        return element;
+      }
+    }
+    return null;
+  }
+
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  async startBulkSend() {
+    if (this.isRunning) {
+      console.log('⚠️ Bulk send already running!');
+      return;
+    }
+
+    this.isRunning = true;
+    this.successCount = 0;
+    this.failCount = 0;
+    
+    console.log(\`🚀 Starting bulk send for \${contacts.length} contacts...\`);
+    
+    for (let i = 0; i < contacts.length; i++) {
+      if (!this.isRunning) break;
+      
+      console.log(\`\\n📤 Sending message \${i + 1}/\${contacts.length}\`);
+      
+      await this.sendToContact(contacts[i]);
+      
+      // Wait between messages (except for last one)
+      if (i < contacts.length - 1) {
+        console.log('⏳ Waiting 6 seconds before next message...');
+        await this.sleep(6000);
+      }
+    }
+    
+    console.log(\`\\n🎉 Bulk send completed!\`);
+    console.log(\`✅ Successful: \${this.successCount}\`);
+    console.log(\`❌ Failed: \${this.failCount}\`);
+    
+    this.isRunning = false;
+  }
+
+  stop() {
+    this.isRunning = false;
+    console.log('⏹️ Bulk send stopped');
+  }
+}
+
+// Initialize
+window.bulkSender = new WhatsAppBulkSender();
+
+console.log('\\n🎯 Ready to send!');
+console.log('Run: bulkSender.startBulkSend()');
+console.log('Or click the START button below');
+
+// Create control buttons
+if (!document.getElementById('bulk-send-controls')) {
+  const controls = document.createElement('div');
+  controls.id = 'bulk-send-controls';
+  controls.style.cssText = \`
     position: fixed;
     top: 20px;
     right: 20px;
-    background: #25D366;
-    color: white;
-    padding: 15px 25px;
-    border-radius: 25px;
-    cursor: pointer;
-    font-weight: bold;
     z-index: 9999;
-    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    border: 2px solid #25D366;
   \`;
-  startBtn.onclick = () => window.bulkSender.startBulkSend();
-  document.body.appendChild(startBtn);
-})();`;
-                            
-                            navigator.clipboard.writeText(script);
-                            alert('🚀 Automation script copied!\n\nNow:\n1. Go to WhatsApp Web tab\n2. Press F12 to open Developer Console\n3. Paste this script and press Enter\n4. Click the "START BULK SEND" button that appears');
+  
+  controls.innerHTML = \`
+    <div style="margin-bottom: 10px; font-weight: bold; color: #25D366;">
+      🚀 WhatsApp Bulk Sender
+    </div>
+    <button id="start-bulk" style="
+      background: #25D366;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-right: 10px;
+      font-weight: bold;
+    ">START BULK SEND</button>
+    <button id="stop-bulk" style="
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    ">STOP</button>
+  \`;
+  
+  document.body.appendChild(controls);
+  
+  // Add event listeners
+  document.getElementById('start-bulk').onclick = () => {
+    if (!window.bulkSender.isRunning) {
+      window.bulkSender.startBulkSend();
+    } else {
+      alert('Bulk send is already running!');
+    }
+  };
+  
+  document.getElementById('stop-bulk').onclick = () => {
+    window.bulkSender.stop();
+  };
+}`;
+                              
+                              navigator.clipboard.writeText(script).then(() => {
+                                alert('✅ Automation script copied successfully!\n\n📋 Next steps:\n1. Go to WhatsApp Web tab\n2. Press F12 to open Console\n3. Paste the script and press Enter\n4. Click "START BULK SEND" button\n\nThe script will send messages automatically with 6-second delays between each message.');
+                              }).catch(() => {
+                                // Fallback for browsers that don't support clipboard API
+                                const textArea = document.createElement('textarea');
+                                textArea.value = script;
+                                document.body.appendChild(textArea);
+                                textArea.select();
+                                document.execCommand('copy');
+                                document.body.removeChild(textArea);
+                                alert('✅ Script copied! Paste it in WhatsApp Web console (F12).');
+                              });
+                              
+                            } catch (error) {
+                              console.error('Error generating script:', error);
+                              alert('❌ Error generating automation script. Please check the console for details.');
+                            }
                           }}
                           className="bg-blue-600 hover:bg-blue-700"
                           size="sm"
