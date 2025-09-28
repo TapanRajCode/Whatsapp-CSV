@@ -47,10 +47,45 @@ const WhatsAppMessenger = () => {
 
   const initWhatsApp = async () => {
     try {
-      await axios.post(`${API}/whatsapp/init`);
-      setTimeout(checkWhatsAppStatus, 2000);
+      setWhatsappStatus({...whatsappStatus, message: 'Initializing WhatsApp connection...'});
+      
+      const response = await axios.post(`${API}/whatsapp/init`);
+      
+      if (response.data.success) {
+        setWhatsappStatus({
+          authenticated: false,
+          qr_available: true,
+          message: response.data.message
+        });
+        
+        // Show detailed instructions if available
+        if (response.data.instructions) {
+          alert(`WhatsApp Connection Started!\n\n${response.data.instructions.join('\n')}`);
+        }
+      } else {
+        setWhatsappStatus({
+          authenticated: false,
+          qr_available: false,
+          message: response.data.message || 'Failed to connect WhatsApp'
+        });
+        
+        // Show alternative guidance
+        if (response.data.alternative) {
+          alert(`Connection Info:\n\n${response.data.alternative}`);
+        }
+      }
+      
+      // Continue polling for status updates
+      setTimeout(checkWhatsAppStatus, 3000);
     } catch (error) {
       console.error('Error initializing WhatsApp:', error);
+      setWhatsappStatus({
+        authenticated: false,
+        qr_available: false,
+        message: 'Failed to connect to WhatsApp. Please try again or use WhatsApp Web manually.'
+      });
+      
+      alert('Connection Error: Unable to initialize WhatsApp. Please ensure the app is running properly.');
     }
   };
 
