@@ -777,8 +777,8 @@ Jane Smith,+0987654321,XYZ Inc
                     <div className="space-y-3">
                       <div className="flex items-center justify-between p-3 bg-white rounded border">
                         <div>
-                          <h5 className="font-medium">Option 1: Enhanced Auto-Send 2025</h5>
-                          <p className="text-sm text-gray-600">Latest selectors + human simulation + anti-bot bypass</p>
+                          <h5 className="font-medium">Option 1: Ultra-Enhanced Auto-Send 2025</h5>
+                          <p className="text-sm text-gray-600">Perfect event sequences + AI detection + pointer events</p>
                         </div>
                         <Button
                           onClick={async () => {
