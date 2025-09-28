@@ -708,10 +708,10 @@ Jane Smith,+0987654321,XYZ Inc
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Send className="h-5 w-5 text-emerald-600" />
-                  Bulk Message Sending
+                  RocketSend-Style Bulk Messaging
                 </CardTitle>
                 <CardDescription>
-                  Send your personalized messages to all contacts automatically via WhatsApp Web
+                  Send personalized messages directly through WhatsApp Web with automated bulk sending
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -753,143 +753,156 @@ Jane Smith,+0987654321,XYZ Inc
                     </div>
                   </div>
 
-                  {/* Bulk Send Actions */}
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 bg-emerald-50 rounded-lg border-l-4 border-l-emerald-500">
-                      <div>
-                        <h4 className="font-medium text-emerald-900">🚀 Ready for Bulk Sending</h4>
-                        <p className="text-sm text-emerald-700 mt-1">
-                          Send personalized messages to all {contacts.length} contacts at once
-                        </p>
+                  {/* RocketSend-Style Interface */}
+                  <div className="p-4 bg-blue-50 rounded-lg border-l-4 border-l-blue-500">
+                    <h4 className="font-medium text-blue-900 mb-3">🚀 RocketSend-Style Automation</h4>
+                    
+                    {/* Step 1: Open WhatsApp Web */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-3 bg-white rounded border">
+                        <div>
+                          <h5 className="font-medium">Step 1: Open WhatsApp Web</h5>
+                          <p className="text-sm text-gray-600">Log in to WhatsApp Web in a separate tab</p>
+                        </div>
+                        <Button
+                          onClick={() => window.open('https://web.whatsapp.com', '_blank')}
+                          className="bg-green-600 hover:bg-green-700"
+                          size="sm"
+                        >
+                          📱 Open WhatsApp Web
+                        </Button>
                       </div>
-                      <Button
-                        onClick={sendBulkMessages}
-                        disabled={!(whatsappStatus.authenticated || whatsappManualOverride) || contacts.length === 0 || !messageTemplate.trim() || sendingProgress.active}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                        size="lg"
-                      >
-                        <Send className="h-4 w-4 mr-2" />
-                        Prepare Bulk Send
-                      </Button>
-                    </div>
-
-                    {/* Send All Button - Only show if messages are ready */}
-                    {messageLogs.some(log => log.status === 'ready_for_batch_send') && (
-                      <div className="p-4 bg-blue-50 rounded-lg border-l-4 border-l-blue-500">
-                        <div className="space-y-4">
-                          <div>
-                            <h4 className="font-medium text-blue-900">📱 Messages Ready to Send</h4>
-                            <p className="text-sm text-blue-700 mt-1">
-                              {(() => {
-                                // Get unique contacts to avoid duplicates
-                                const uniqueMessages = messageLogs.filter(log => log.status === 'ready_for_batch_send')
-                                  .reduce((acc, log) => {
-                                    if (!acc.find(item => item.phone === log.phone)) {
-                                      acc.push(log);
-                                    }
-                                    return acc;
-                                  }, []);
-                                return uniqueMessages.length;
-                              })()} personalized messages are prepared and ready
-                            </p>
-                          </div>
-                          
-                          {/* Copy Messages - Alternative to WhatsApp Web */}
-                          <div className="space-y-3">
-                            <div className="p-3 bg-orange-100 rounded border border-orange-200">
-                              <h5 className="text-sm font-medium text-orange-900">⚠️ WhatsApp Web Access Issue Detected</h5>
-                              <p className="text-xs text-orange-800 mt-1">
-                                Since WhatsApp Web seems blocked, here are your personalized messages to copy and send manually:
-                              </p>
-                            </div>
+                      
+                      {/* Step 2: Inject Automation */}
+                      <div className="flex items-center justify-between p-3 bg-white rounded border">
+                        <div>
+                          <h5 className="font-medium">Step 2: Enable Automation</h5>
+                          <p className="text-sm text-gray-600">Copy and paste the automation script in WhatsApp Web console</p>
+                        </div>
+                        <Button
+                          onClick={() => {
+                            const script = `
+// WhatsApp Automation Script - Paste this in WhatsApp Web Console (F12)
+(function() {
+  const contacts = ${JSON.stringify(contacts)};
+  const messageTemplate = "${messageTemplate.replace(/"/g, '\\"').replace(/\n/g, '\\n')}";
+  
+  class BulkSender {
+    constructor() {
+      this.queue = [];
+      this.currentIndex = 0;
+      this.isRunning = false;
+    }
+    
+    formatPhone(phone) {
+      return phone.replace(/\\D/g, '').replace(/^91/, '');
+    }
+    
+    personalizeMessage(template, contact) {
+      return template.replace(/{name}/g, contact.name);
+    }
+    
+    async sendToContact(contact) {
+      const phone = this.formatPhone(contact.phone);
+      const message = this.personalizeMessage(messageTemplate, contact);
+      
+      // Create URL and navigate
+      const url = \`https://web.whatsapp.com/send?phone=91\${phone}&text=\${encodeURIComponent(message)}\`;
+      window.location.href = url;
+      
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const sendBtn = document.querySelector('[data-testid="send"]') || 
+                        document.querySelector('[aria-label="Send"]') ||
+                        document.querySelector('[data-icon="send"]');
+          
+          if (sendBtn) {
+            sendBtn.click();
+            console.log(\`✅ Sent to \${contact.name} (\${contact.phone})\`);
+            resolve(true);
+          } else {
+            console.log(\`❌ Could not send to \${contact.name}\`);
+            resolve(false);
+          }
+        }, 3000);
+      });
+    }
+    
+    async startBulkSend() {
+      console.log('🚀 Starting bulk send for', contacts.length, 'contacts');
+      
+      for (let i = 0; i < contacts.length; i++) {
+        console.log(\`Sending \${i+1}/\${contacts.length} to \${contacts[i].name}\`);
+        await this.sendToContact(contacts[i]);
+        
+        // Wait between messages
+        if (i < contacts.length - 1) {
+          console.log('Waiting 5 seconds before next message...');
+          await new Promise(resolve => setTimeout(resolve, 5000));
+        }
+      }
+      
+      console.log('🎉 Bulk sending completed!');
+    }
+  }
+  
+  window.bulkSender = new BulkSender();
+  
+  console.log('Automation loaded! Run: bulkSender.startBulkSend()');
+  console.log('Or click the START BULK SEND button that will appear');
+  
+  // Create a start button
+  const startBtn = document.createElement('div');
+  startBtn.innerHTML = '🚀 START BULK SEND';
+  startBtn.style.cssText = \`
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #25D366;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+    z-index: 9999;
+    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+  \`;
+  startBtn.onclick = () => window.bulkSender.startBulkSend();
+  document.body.appendChild(startBtn);
+})();`;
                             
-                            <div className="space-y-2">
-                              {(() => {
-                                // Get unique messages to avoid duplicates
-                                const uniqueMessages = messageLogs.filter(log => log.status === 'ready_for_batch_send')
-                                  .reduce((acc, log) => {
-                                    if (!acc.find(item => item.phone === log.phone)) {
-                                      acc.push(log);
-                                    }
-                                    return acc;
-                                  }, []);
-                                  
-                                return uniqueMessages.map((log, index) => {
-                                  const contactName = contacts.find(c => c.phone === log.phone)?.name || `Contact ${index + 1}`;
-                                  return (
-                                    <div key={log.phone} className="bg-white border border-gray-200 rounded-lg p-3">
-                                      <div className="flex items-center justify-between mb-2">
-                                        <h6 className="font-medium text-gray-900">{contactName}</h6>
-                                        <div className="flex items-center gap-2">
-                                          <span className="text-xs text-gray-500">{log.phone}</span>
-                                          <Button
-                                            onClick={() => {
-                                              navigator.clipboard.writeText(log.message);
-                                              alert(`✅ Message copied for ${contactName}!\n\nNow open WhatsApp on your phone and paste this message.`);
-                                            }}
-                                            size="sm"
-                                            className="bg-blue-600 hover:bg-blue-700 text-white"
-                                          >
-                                            📋 Copy Message
-                                          </Button>
-                                        </div>
-                                      </div>
-                                      <div className="bg-gray-50 p-2 rounded text-sm font-mono whitespace-pre-wrap">
-                                        {log.message}
-                                      </div>
-                                    </div>
-                                  );
-                                });
-                              })()}
-                            </div>
-                          </div>
-                          
-                          {/* Alternative Methods */}
-                          <div className="p-3 bg-green-50 rounded border border-green-200">
-                            <h5 className="text-sm font-medium text-green-900">📱 Alternative Sending Methods:</h5>
-                            <ol className="text-xs text-green-800 space-y-1 mt-2">
-                              <li><strong>Method 1:</strong> Click "📋 Copy Message" → Open WhatsApp on your phone → Find contact → Paste & Send</li>
-                              <li><strong>Method 2:</strong> Use WhatsApp Desktop App (if installed) instead of web version</li>
-                              <li><strong>Method 3:</strong> Try accessing WhatsApp Web from a different network or VPN</li>
-                              <li><strong>Method 4:</strong> Forward messages from WhatsApp mobile app to multiple contacts</li>
-                            </ol>
-                          </div>
+                            navigator.clipboard.writeText(script);
+                            alert('🚀 Automation script copied!\n\nNow:\n1. Go to WhatsApp Web tab\n2. Press F12 to open Developer Console\n3. Paste this script and press Enter\n4. Click the "START BULK SEND" button that appears');
+                          }}
+                          className="bg-blue-600 hover:bg-blue-700"
+                          size="sm"
+                        >
+                          📋 Copy Automation Script
+                        </Button>
+                      </div>
+                      
+                      {/* Step 3: Instructions */}
+                      <div className="p-3 bg-yellow-50 rounded border border-yellow-200">
+                        <h5 className="font-medium text-yellow-900 mb-2">📝 How to Use:</h5>
+                        <ol className="text-sm text-yellow-800 space-y-1">
+                          <li><strong>1.</strong> Click "📱 Open WhatsApp Web" and log in</li>
+                          <li><strong>2.</strong> Click "📋 Copy Automation Script"</li>
+                          <li><strong>3.</strong> In WhatsApp Web, press <kbd>F12</kbd> to open Console</li>
+                          <li><strong>4.</strong> Paste the script and press Enter</li>
+                          <li><strong>5.</strong> Click the "🚀 START BULK SEND" button that appears</li>
+                          <li><strong>6.</strong> Watch as messages are sent automatically!</li>
+                        </ol>
+                      </div>
+                      
+                      {/* Alternative Method */}
+                      <div className="p-3 bg-green-50 rounded border border-green-200">
+                        <h5 className="font-medium text-green-900 mb-2">💡 Alternative: Manual Console Commands</h5>
+                        <p className="text-sm text-green-800 mb-2">After pasting the script, you can also run individual commands:</p>
+                        <div className="bg-white p-2 rounded text-xs font-mono">
+                          <div>bulkSender.startBulkSend() // Start bulk sending</div>
+                          <div>console.log(contacts) // View your contacts</div>
                         </div>
                       </div>
-                    )}
-
-                    {/* Progress Display */}
-                    {sendingProgress.active && (
-                      <div className="space-y-2">
-                        <Progress value={sendingProgress.progress} className="w-full" />
-                        <p className="text-sm text-gray-600 text-center">{sendingProgress.message}</p>
-                      </div>
-                    )}
-
-                    {sendingProgress.message && !sendingProgress.active && (
-                      <Alert className="border-emerald-200 bg-emerald-50">
-                        <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                        <AlertDescription className="text-emerald-700">
-                          {sendingProgress.message}
-                        </AlertDescription>
-                      </Alert>
-                    )}
-                  </div>
-
-                  {/* Instructions */}
-                  <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-                    <h4 className="font-medium text-yellow-900 mb-2">📝 How to Send Your Gig Invitations:</h4>
-                    <ol className="text-sm text-yellow-800 space-y-1 mb-3">
-                      <li><strong>1.</strong> Click "Prepare Bulk Send" to process all your contacts</li>
-                      <li><strong>2.</strong> Click "📋 Copy Message" for each contact</li>
-                      <li><strong>3.</strong> Open WhatsApp on your phone</li>
-                      <li><strong>4.</strong> Find the contact and paste the personalized message</li>
-                      <li><strong>5.</strong> Send the message</li>
-                    </ol>
-                    
-                    <div className="p-2 bg-red-100 rounded text-xs text-red-800">
-                      <strong>⚠️ WhatsApp Web Access Issue:</strong> It appears WhatsApp Web is blocked on your network. 
-                      The copy-paste method above will work perfectly with your WhatsApp mobile app instead.
                     </div>
                   </div>
                 </div>
