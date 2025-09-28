@@ -24,7 +24,7 @@ const WhatsAppMessenger = () => {
   const [uploadStatus, setUploadStatus] = useState(null);
   const [sendingProgress, setSendingProgress] = useState({ active: false, progress: 0, message: '' });
   const [messageLogs, setMessageLogs] = useState([]);
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [connectionInstructions, setConnectionInstructions] = useState(null);
 
   useEffect(() => {
     checkWhatsAppStatus();
