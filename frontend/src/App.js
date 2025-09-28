@@ -1275,6 +1275,34 @@ class EnhancedWhatsAppSender {
     return isVisible && hasPointer && isActive;
   }
 
+  // Find message input using latest selectors
+  async findMessageInput() {
+    const inputSelectors = [
+      'div[contenteditable="true"][data-testid="conversation-compose-box-input"]', // 2025 primary
+      'div[contenteditable="true"][data-tab="10"]', // Legacy but still used
+      'div[contenteditable="true"][role="textbox"]',
+      'div[contenteditable="true"]', // Fallback
+      '[data-testid="conversation-compose-box-input"]'
+    ];
+    
+    for (const selector of inputSelectors) {
+      const input = document.querySelector(selector);
+      if (input && this.isVisibleAndClickable(input)) {
+        console.log(\`✅ Found input with selector: \${selector}\`);
+        return input;
+      }
+    }
+    
+    return null;
+  }
+
+  isVisibleAndClickable(element) {
+    if (!element || !element.offsetParent) return false;
+    const rect = element.getBoundingClientRect();
+    return rect.width > 0 && rect.height > 0 && 
+           rect.top >= 0 && rect.left >= 0;
+  }
+
   async startSending() {
     if (this.isRunning) {
       console.log('Already running!');
