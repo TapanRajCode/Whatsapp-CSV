@@ -1516,17 +1516,16 @@ document.body.appendChild(control);
 document.getElementById('enhanced-start').onclick = () => enhancedSender.startSending();
 document.getElementById('enhanced-stop').onclick = () => enhancedSender.stop();
 
-console.log('💥 NUCLEAR SENDER 2025 READY!');
-console.log('🚨 NUCLEAR Features:');
-console.log('• Green button hunting (targets exact WhatsApp green send button)');
-console.log('• SVG arrow detection and clicking');
-console.log('• Position-based targeting (bottom-right area)');
-console.log('• Brute force clicking on compose area elements');
-console.log('• Multiple keyboard simulation variations');
-console.log('• Nuclear click sequences (removes overlays, multiple event types)');
-console.log('• Touch event simulation for mobile compatibility');
+console.log('⚛️ QUANTUM SENDER 2025 READY!');
+console.log('🔬 QUANTUM Features:');
+console.log('• React component hijacking (direct component access)');
+console.log('• WhatsApp Store direct access (internal API)');
+console.log('• DOM event cascade (all possible event types)');
+console.log('• Form submission hijacking');
+console.log('• Memory patching (runtime behavior modification)');
+console.log('• Direct DOM manipulation (force send via input clearing)');
 console.log('');
-console.log('Click "💥 START NUCLEAR SEND" or run: enhancedSender.startSending()')`;
+console.log('Click "⚛️ START QUANTUM SEND" or run: enhancedSender.startSending()')`;
 
                               // Fallback clipboard function
                               const fallbackCopyToClipboard = (text) => {
