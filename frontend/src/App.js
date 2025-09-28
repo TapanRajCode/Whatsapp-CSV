@@ -1216,8 +1216,8 @@ class EnhancedWhatsAppSender {
     // Extended wait for page load and WhatsApp processing
     await this.sleep(10000);
     
-    // Try enhanced send
-    const success = await this.enhancedSendAttempt();
+    // Try ultra-enhanced send
+    const success = await this.ultraEnhancedSendAttempt();
     
     if (success) {
       console.log(\`✅ SUCCESS: \${contact.name}\`);
