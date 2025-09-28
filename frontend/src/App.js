@@ -1216,6 +1216,16 @@ class EnhancedWhatsAppSender {
     // Extended wait for page load and WhatsApp processing
     await this.sleep(10000);
     
+    // Wait for send button to become active (advanced technique)
+    console.log('⏳ Waiting for send button to become active...');
+    const sendButtonReady = await this.waitForSendButtonActive();
+    
+    if (sendButtonReady) {
+      console.log('✅ Send button is active, proceeding with send...');
+    } else {
+      console.log('⚠️ Send button not detected as active, proceeding anyway...');
+    }
+    
     // Try ultra-enhanced send
     const success = await this.ultraEnhancedSendAttempt();
     
@@ -1231,6 +1241,38 @@ class EnhancedWhatsAppSender {
     this.updateControlPanel();
     
     return success;
+  }
+
+  // Wait for send button to become clickable/active
+  async waitForSendButtonActive(timeout = 15000) {
+    const startTime = Date.now();
+    
+    while (Date.now() - startTime < timeout) {
+      const sendButton = await this.findSendButton();
+      if (sendButton && this.isSendButtonActive(sendButton)) {
+        return true;
+      }
+      await this.sleep(500);
+    }
+    
+    return false;
+  }
+
+  isSendButtonActive(button) {
+    // Check if button is not disabled
+    if (button.disabled || button.getAttribute('disabled')) return false;
+    
+    // Check visual state
+    const styles = window.getComputedStyle(button);
+    const isVisible = styles.opacity !== '0' && styles.visibility !== 'hidden';
+    const hasPointer = styles.cursor === 'pointer';
+    
+    // Check if button appears "active" (not grayed out)
+    const isActive = !button.classList.contains('disabled') && 
+                    !button.classList.contains('inactive') &&
+                    !button.hasAttribute('aria-disabled');
+    
+    return isVisible && hasPointer && isActive;
   }
 
   async startSending() {
