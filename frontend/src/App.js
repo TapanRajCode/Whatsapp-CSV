@@ -1360,7 +1360,7 @@ console.log('Click "▶️ START SENDING" or run: enhancedSender.startSending()'
                           <p className="text-sm text-gray-600">Auto-navigate + manual send (most reliable)</p>
                         </div>
                         <Button
-                          onClick={() => {
+                          onClick={async () => {
                             try {
                               const cleanContacts = contacts.map(contact => ({
                                 name: contact.name,
@@ -1465,9 +1465,62 @@ console.log('🎯 SMART MANUAL HELPER READY!');
 console.log('This will auto-navigate to each contact. You just need to click Send manually.');
 console.log(\`Total contacts: \${contacts.length}\`);`;
 
-                              navigator.clipboard.writeText(script).then(() => {
+                              // Fallback clipboard function (same as above)
+                              const fallbackCopyToClipboard = (text) => {
+                                const textArea = document.createElement('textarea');
+                                textArea.value = text;
+                                textArea.style.position = 'fixed';
+                                textArea.style.left = '-999999px';
+                                textArea.style.top = '-999999px';
+                                document.body.appendChild(textArea);
+                                textArea.focus();
+                                textArea.select();
+                                
+                                try {
+                                  document.execCommand('copy');
+                                  textArea.remove();
+                                  return true;
+                                } catch (err) {
+                                  textArea.remove();
+                                  return false;
+                                }
+                              };
+
+                              // Try modern clipboard API first, then fallback
+                              const copyToClipboard = async (text) => {
+                                if (navigator.clipboard && window.isSecureContext) {
+                                  try {
+                                    await navigator.clipboard.writeText(text);
+                                    return true;
+                                  } catch (err) {
+                                    console.warn('Modern clipboard failed, trying fallback:', err);
+                                    return fallbackCopyToClipboard(text);
+                                  }
+                                } else {
+                                  return fallbackCopyToClipboard(text);
+                                }
+                              };
+
+                              const success = await copyToClipboard(script);
+                              
+                              if (success) {
                                 alert('🎯 SMART MANUAL HELPER COPIED!\n\nThis approach:\n• Auto-navigates to each contact\n• Pre-fills the personalized message\n• You manually click "Send" (most reliable)\n• Tracks progress automatically\n\nInstructions:\n1. Open WhatsApp Web\n2. F12 → Console\n3. Paste script → Enter\n4. Click "📱 GO TO NEXT CONTACT"\n5. Manually click Send\n6. Repeat for all contacts\n\nThis is the most reliable method!');
-                              });
+                              } else {
+                                // Show the script in a popup if copy fails
+                                const popup = window.open('', 'script', 'width=800,height=600,scrollbars=yes');
+                                popup.document.write(`
+                                  <html>
+                                    <head><title>Smart Manual Helper Script</title></head>
+                                    <body>
+                                      <h2>🎯 Smart Manual Helper Script</h2>
+                                      <p><strong>Copy failed - please manually copy this script:</strong></p>
+                                      <textarea style="width:100%; height:400px; font-family:monospace;" readonly>${script}</textarea>
+                                      <br><br>
+                                      <button onclick="navigator.clipboard.writeText(document.querySelector('textarea').value).then(() => alert('Copied!')).catch(() => alert('Please manually select and copy'))">Try Copy Again</button>
+                                    </body>
+                                  </html>
+                                `);
+                              }
                             } catch (error) {
                               alert('Error: ' + error.message);
                             }
