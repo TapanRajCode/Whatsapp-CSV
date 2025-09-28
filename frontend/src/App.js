@@ -1508,7 +1508,7 @@ console.log('Click "⚡ START ULTRA SEND" or run: enhancedSender.startSending()'
                           className="bg-red-600 hover:bg-red-700 text-white font-bold"
                           size="sm"
                         >
-                          🚀 Copy Enhanced Script 2025
+                          ⚡ Copy Ultra-Enhanced Script
                         </Button>
                       </div>
                       
