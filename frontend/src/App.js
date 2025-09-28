@@ -257,10 +257,14 @@ const WhatsAppMessenger = () => {
       return;
     }
 
-    setSendingProgress({ active: true, progress: 0, message: 'Sending messages...' });
+    setSendingProgress({ active: true, progress: 0, message: 'Initializing WhatsApp automation...' });
 
     try {
       const contactIds = contacts.map(contact => contact.id);
+      
+      // Update progress during sending
+      setSendingProgress({ active: true, progress: 25, message: `Sending messages to ${contacts.length} contacts automatically...` });
+      
       const response = await axios.post(`${API}/messages/send-bulk`, {
         template: messageTemplate,
         contact_ids: contactIds
@@ -272,13 +276,24 @@ const WhatsAppMessenger = () => {
         message: response.data.message 
       });
       
+      // Auto-refresh message logs to show results
       fetchMessageLogs();
+      
+      // Show success notification
+      if (response.data.success && response.data.sent_count > 0) {
+        setTimeout(() => {
+          alert(`🎉 Bulk sending complete!\n\nSent: ${response.data.sent_count} messages\nFailed: ${response.data.failed_count} messages\n\nCheck Message Logs tab for details.`);
+        }, 1000);
+      }
+      
     } catch (error) {
       setSendingProgress({ 
         active: false, 
         progress: 0, 
-        message: error.response?.data?.detail || 'Error sending messages' 
+        message: error.response?.data?.detail || 'Error sending messages via WhatsApp automation' 
       });
+      
+      alert(`Sending Error: ${error.response?.data?.detail || 'Failed to send messages. Please try again or check WhatsApp Web connection.'}`);
     }
   };
 
