@@ -1472,7 +1472,7 @@ control.innerHTML = \`
     💥 NUCLEAR SENDER 2025
   </div>
   <div style="font-size: 12px; margin-bottom: 15px; opacity: 0.9;">
-    Perfect event sequence • Advanced AI detection • Auto-retry
+    Green button hunting • SVG detection • Nuclear click sequences
   </div>
   
   <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px; margin-bottom: 15px;">
