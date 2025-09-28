@@ -25,6 +25,7 @@ const WhatsAppMessenger = () => {
   const [sendingProgress, setSendingProgress] = useState({ active: false, progress: 0, message: '' });
   const [messageLogs, setMessageLogs] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [connectionInstructions, setConnectionInstructions] = useState(null);
   const [showFormatting, setShowFormatting] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
