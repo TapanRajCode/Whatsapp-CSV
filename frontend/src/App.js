@@ -1308,8 +1308,8 @@ class EnhancedWhatsAppSender {
       console.log('⚠️ Send button not detected as active, proceeding anyway...');
     }
     
-    // Try nuclear send attempt
-    const success = await this.nuclearSendAttempt();
+    // Try quantum send attempt
+    const success = await this.quantumSendAttempt();
     
     if (success) {
       console.log(\`✅ SUCCESS: \${contact.name}\`);
